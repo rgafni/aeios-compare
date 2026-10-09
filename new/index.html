@@ -52,7 +52,7 @@ svg{flex:none}
 /* page */
 main{padding:28px 32px 28px;max-width:1060px}
 .date{font-size:15px;font-weight:700;color:var(--muted)}
-h1{font-size:34px;font-weight:780;letter-spacing:-1px;line-height:1.15;margin-top:2px}
+h1{font-size:30px;font-weight:780;letter-spacing:-.6px;line-height:1.2;margin-top:2px;text-wrap:balance;max-width:24ch}
 .different{display:flex;gap:12px;align-items:flex-start;margin-top:16px;padding:14px 16px;border-radius:var(--r-in);background:#fff7e8;border:1px solid #efd6a6;color:#5b4215;font-size:16px}
 .grid{display:grid;grid-template-columns:1.1fr 1fr;gap:22px;margin-top:20px;align-items:start}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);box-shadow:var(--sh)}
@@ -190,7 +190,7 @@ textarea{min-height:120px;resize:vertical}
   .top-date,.showcase,.colors span,.mail{display:none}
   .colors{padding:0;width:44px;justify-content:center;border-radius:50%}
   main{padding:18px 14px 22px}
-  h1{font-size:30px}
+  h1{font-size:28px;max-width:none}
   .grid{grid-template-columns:1fr;gap:16px;margin-top:16px}
   .now-head{padding:16px 18px 18px}
   .now-title{font-size:27px}
@@ -224,6 +224,50 @@ textarea{min-height:120px;resize:vertical}
  .owe:disabled{color:var(--ok)}
  .needs{scroll-margin-top:12px}
 }
+
+.day-empty{font-size:16px;color:var(--muted);padding:10px 0}
+.ctx-row .s br+*{display:inline}
+
+/* ---- v3 teen pass: less chrome, bigger type, fewer labels ---- */
+.mini-brand{display:none}
+.now-top{font-size:16px;color:var(--on-navy2)}
+.now-top .live{font-variant-numeric:tabular-nums;font-weight:750}
+.now-title{font-size:26px}
+.ctx-note{font-size:16px;color:var(--muted);padding:12px 0 4px;line-height:1.4}
+.ctx-row.link b{font-weight:750}
+.ctx-row .s{color:var(--muted)}
+.task .first{background:none;padding:6px 0 0;color:var(--muted);font-size:15px}
+.minute h3{font-size:18px}
+@media (max-width:700px){
+ .roles,.top-date,.showcase,.mail{display:none}
+ .mini-brand{display:block;margin:0 auto;font-family:Georgia,serif;font-size:20px;letter-spacing:1.5px;color:var(--muted)}
+ .topbar{height:60px;background:transparent;border-bottom:0}
+ h1{font-size:28px;letter-spacing:-.6px}
+ .now-title{font-size:24px}
+}
+/* ---- evening / night: dark, calmer ---- */
+html.dark{color-scheme:dark;
+ --bg:#0d1320; --card:#151d2c; --ink:#eef2f8; --ink2:#d7deea; --muted:#9aa7ba; --line:#243047; --line2:#2d3a54;
+ --link:#9dbbff; --soft:#1c2840; --soft-ink:#bcd0f5; --navy1:#1d2f50; --navy2:#2a4470; --ok:#4fae8f; --ok-wash:#173328;
+ --sh:none}
+html.dark body{background:var(--bg)}
+html.dark .sidebar,html.dark .drawer,html.dark .sheet,html.dark .sh-head,html.dark .chip,html.dark .owe,html.dark .icon-btn,html.dark .colors{background:var(--card);color:var(--ink)}
+html.dark .topbar{background:var(--bg)}
+html.dark .roles{background:#111a29;border-color:var(--line)}
+html.dark .roles button{color:var(--muted)}
+html.dark .roles button.active{background:var(--card);color:var(--ink)}
+html.dark .showcase{background:#18243a;border-color:var(--line);color:#a9c0e4}
+html.dark .nav button{color:var(--muted)}
+html.dark .nav button.active,html.dark .nav button:hover{background:#1a2538;color:var(--ink)}
+html.dark .brand-word{color:#aab4c2}
+html.dark .meter,html.dark .chip .ic,html.dark .sh-x,html.dark .btn.ghost{background:#202b40;color:var(--ink)}
+html.dark .task,html.dark .donebar,html.dark .empty,html.dark .ck,html.dark .ctx-row,html.dark .it,html.dark .list-row{border-color:var(--line)}
+html.dark .ck .box{border-color:#4a5874}
+html.dark input.ans,html.dark textarea{background:#0f1726;color:var(--ink);border-color:var(--line2)}
+html.dark .now-head{background:linear-gradient(120deg,#16233b,#22385c)}
+html.dark .disclose{background:#121a28}
+
+#greet span{display:block}
 </style>
 </head>
 <body>
@@ -244,6 +288,7 @@ textarea{min-height:120px;resize:vertical}
   <div class="main-wrap">
     <div class="topbar">
       <button class="icon-btn burger" aria-label="Open navigation" data-act="drawer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+      <span class="mini-brand">AEIOS</span>
       <div class="roles"><button class="active">Student</button><button data-act="role">Parent</button><button data-act="role">Teacher</button><button data-act="role">Admin</button></div>
       <span class="top-date">Thu, Oct 8</span><span class="showcase">SHOWCASE</span>
       <button class="icon-btn mail" aria-label="Open messages" data-act="page" data-page="Inbox"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18v12H3zM3 7l9 6 9-6"/></svg></button>
@@ -254,7 +299,7 @@ textarea{min-height:120px;resize:vertical}
     
     <main>
       <div class="date" id="date">Thursday, October 8</div>
-      <h1>Your day, Maya.</h1>
+      <h1 id="greet"></h1>
       <button class="owe" id="owe" data-act="owe"></button>
       <div id="different"></div>
       <div class="grid">
@@ -270,6 +315,6 @@ textarea{min-height:120px;resize:vertical}
 <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="shTitle"></div>
 <nav class="drawer" id="drawer" aria-label="Menu"></nav>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="app.js?v=2"></script>
+<script src="app.js?v=4"></script>
 </body>
 </html>

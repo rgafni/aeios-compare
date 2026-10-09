@@ -29,7 +29,7 @@ function clock(m){var h=Math.floor(m/60),mm=m%60,ap=h>=12?'PM':'AM';h=h%12||12;r
 function short(m){var h=Math.floor(m/60)%12||12,mm=m%60;return h+':'+(mm<10?'0':'')+mm;}
 function dur(n){return n<60?n+' min':Math.floor(n/60)+' hr'+(n%60?' '+n%60+' min':'');}
 /* demo time: ?t=HHMM (the compare wrapper sets this). */
-var q=new URLSearchParams(location.search).get('t'),T=/^\d{3,4}$/.test(q||'')?(+q.slice(0,-2))*60+(+q.slice(-2)):945;
+var hm=/t=(\d{1,2}):(\d{2})/.exec(location.hash),q=hm?(hm[1]+hm[2]):new URLSearchParams(location.search).get('t'),T=/^\d{3,4}$/.test(q||'')?(+q.slice(0,-2))*60+(+q.slice(-2)):945;
 var KEY='aeios-new-demo-v2';
 function fresh(){return {expanded:false,earlier:false,done:{},doneOrder:[],steps:{},checks:{school:JSON.parse(JSON.stringify(LISTS.school.start)),night:{}},journal:[],teaser:{solved:false,hints:0}};}
 var S;try{S=JSON.parse(localStorage.getItem(KEY))||fresh();}catch(e){S=fresh();}
@@ -45,70 +45,106 @@ function firstOpen(t){var d=S.steps[t.id]||{};for(var i=0;i<t.steps.length;i++)i
 function ckRow(l,i){var it=LISTS[l].items[i],on=!!S.checks[l][i];return '<button class="ck'+(on?' on':'')+'" data-act="ck" data-list="'+l+'" data-i="'+i+'" role="checkbox" aria-checked="'+on+'"><span class="box">'+TICK+'</span><span class="txt">'+esc(it[0])+(it[1]?'<small>'+esc(it[1])+'</small>':'')+'</span></button>';}
 function listBlock(l){var n=cnt(l);var h='<div class="ctx-hd">'+LISTS[l].title+' <span data-count="'+l+'">'+n+' of 6</span></div><div class="meter" aria-hidden="true"><i data-meter="'+l+'" style="width:'+(n/6*100)+'%"></i></div>';for(var i=0;i<6;i++)h+=ckRow(l,i);return h;}
 function curNext(){var cur=null,next=null,prev=null;ALL.forEach(function(i){if(i.s<=T&&T<i.e)cur=i;if(i.e<=T)prev=i;if(!next&&i.s>T)next=i;});return {cur:cur,next:next,prev:prev};}
+var FIRST=ALL[0],LAST=ALL[ALL.length-1];
+var SHORT={'Mathematics':'Math','Lunch & recess':'Lunch','Studio & thinking skills':'Studio','Snack & decompress':'Snack','Read a chapter':'Reading','Reading & quiet time':'Quiet reading','Review math corrections':'Math corrections','Piano practice':'Piano'};
+function nm(i){return SHORT[i.n]||i.n;}
+var HW=[P[2].items[P[2].items.length-1][1],P[3].items[0][0]]; /* free stretch after the last after-school activity, before dinner */
+function inHW(){return T>=HW[0]&&T<HW[1];}
+var LEAVE=ALL.filter(function(i){return i.travel;})[0];
+function things(n,w){return n+' '+(n===1?'thing':'things')+' '+w;}
+function soonOpen(){return openTasks().filter(function(t){return t.soon;});}
+function greeting(){
+ var c=curNext(),cur=c.cur,next=c.next,o=openTasks(),soon=soonOpen().length;
+ if(T<LEAVE.s){
+  if(cur&&cur.list==='school'){var n=6-cnt('school');return n?'Leave by '+short(LEAVE.s)+'. '+things(n,'left to pack')+'.':'Bag\u2019s packed. Leave by '+short(LEAVE.s)+'.';}
+  if(!cur&&c.prev)return 'Leave in '+dur(LEAVE.s-T)+'.';
+  return 'Morning, Maya. Leave by '+short(LEAVE.s)+'.';}
+ if(cur&&cur.travel&&cur.phase.id==='morning')return 'On the way. '+nm(next)+' at '+short(next.s)+'.';
+ if(T<870){if(cur&&cur.n==='Pack up')return 'Pack up. School\u2019s out at '+short(cur.e)+'.';
+  if(cur)return nm(cur)+' till '+short(cur.e)+'.';return nm(next)+' at '+short(next.s)+'.';}
+ if(T<HW[0]){
+  if(cur&&cur.travel)return 'School\u2019s out. '+nm(next)+' at '+short(next.s)+'.';
+  if(cur&&cur.n==='Snack & decompress')return 'Home stretch. '+(o.length?'Homework at '+short(HW[0])+'.':'Nothing due tonight.');
+  if(cur)return nm(cur)+' till '+short(cur.e)+'.'+(next&&next.s>=HW[0]&&o.length?' Homework after.':'');
+  return 'Free till '+short(next.s)+'.';}
+ if(inHW())return o.length?'Homework time. Start with '+SUBJ[o[0].subject].name+'.':'Free till dinner at '+short(HW[1])+'.';
+ if(cur&&cur.list==='night'){var m=6-cnt('night');return m?'Almost bedtime. '+things(m,'left to do')+'.':'All set for tomorrow.';}
+ if(cur&&cur.n==='Reading & quiet time')return 'Wind down. Lights out at '+short(cur.e)+'.';
+ if(cur&&cur.n==='Lights out'||T>=LAST.s)return 'Lights out at '+short(LAST.s)+'. Tomorrow starts at '+short(FIRST.s)+'.';
+ if(cur)return nm(cur)+' till '+short(cur.e)+'.';
+ return 'Free till '+short(next.s)+'.'+(soon?' '+things(soon,'due tomorrow')+'.':'');
+}
+function renderGreet(){var g=greeting(),e=$('greet');if(e.getAttribute('aria-label')===g)return;e.setAttribute('aria-label',g);e.innerHTML=g.split(/(?<=\.)\s+/).map(function(s){return '<span>'+esc(s)+'</span>';}).join(' ');}
+function linkRow(icon,t,b,s){return '<button class="ctx-row link" data-act="task" data-id="'+t.id+'"><span><b>'+b+'</b><span class="s">'+s+'</span></span>'+svg('right',20,'chev')+'</button>';}
 function context(cur){
- var h='';
- if(cur&&cur.list==='school'){h+=listBlock('school');}
- else if(cur&&cur.phase.id==='school'){
-  h+='<div class="ctx-row"><span class="ic">'+svg('book',18)+'</span><span><b>Today in class</b><span class="s">'+esc(cur.detail||'')+'</span></span></div>';
+ var h='',o=openTasks(),top=o[0];
+ if(T<LEAVE.s){h+=listBlock('school');}
+ else if(cur&&cur.phase.id==='school'&&!cur.travel){
+  if(cur.detail)h+='<p class="ctx-note">'+esc(cur.detail)+'</p>';
   if(cur.subject){var t=TASKS.filter(function(x){return x.subject===cur.subject&&!S.done[x.id];})[0];
-   if(t)h+='<button class="ctx-row link" data-act="task" data-id="'+t.id+'"><span class="ic">'+svg('pencil',18)+'</span><span><b>Your '+SUBJ[t.subject].name+' work</b><span class="s">'+esc(t.title)+' \u00b7 '+t.due+'</span></span>'+svg('right',20,'chev')+'</button>';}
- }
- else if(PH.id==='after'){
-  var last=P[2].items[P[2].items.length-1],dinner=P[3].items[0],from=Math.max(T,last[1]),top=openTasks()[0];
-  if(top&&T<dinner[0])h+='<button class="ctx-row link" data-act="task" data-id="'+top.id+'"><span class="ic">'+svg('pencil',18)+'</span><span><b>Homework time: '+short(from)+' \u2013 '+clock(dinner[0])+'</b><span class="s">Start with: '+esc(top.title)+' \u00b7 '+top.minutes+' min</span></span>'+svg('right',20,'chev')+'</button>';
-  else if(!top)h+='<div class="ctx-row"><span class="ic">'+svg('check',18)+'</span><span><b>No schoolwork left for today</b><span class="s">Enjoy the break.</span></span></div>';
- }
- else if(cur&&cur.list==='night'){h+=listBlock('night')+'<button class="goal-line" data-act="goal">'+svg('flag',18)+'<span>Packing your bag counts toward your goal \u00b7 '+GOAL.done+' of 7 days</span></button>';}
+   if(t)h+=linkRow('',t,esc(t.title),SUBJ[t.subject].name+' \u00b7 '+t.due);}}
+ else if(T>=870&&T<HW[1]){
+  if(top&&!inHW())h+=linkRow('',top,'Homework at '+clock(HW[0]),'First up: '+esc(top.title)+' \u00b7 '+top.minutes+' min');
+  else if(top){var fi=firstOpen(top);h+=linkRow('',top,esc(top.title),SUBJ[top.subject].name+' \u00b7 '+top.due+' \u00b7 '+top.minutes+' min'+(fi>=0?'<br>'+(fi?'Next':'First')+': '+esc(top.steps[fi]):''));}
+  else if(T>=900)h+='<p class="ctx-note">No homework left. Afternoon\u2019s yours.</p>';}
+ else if(cur&&cur.list==='night'){h+=listBlock('night');}
+ else if(T>=HW[1]&&T<1230){var sn=soonOpen()[0];if(sn)h+=linkRow('',sn,esc(sn.title),'Due tomorrow \u00b7 '+sn.minutes+' min');}
+ else if(T>=1260&&T<1290&&cnt('night')<6){h+='<button class="ctx-row link" data-act="list" data-list="night"><span><b>Ready for tomorrow</b><span class="s"><span data-count="night">'+cnt('night')+' of 6</span> done</span></span>'+svg('right',20,'chev')+'</button>';}
  return h?'<div class="ctx">'+h+'</div>':'';
 }
 function row(item,cls){var a='';if(item.list)a='<div><button class="chipbtn" data-act="list" data-list="'+item.list+'">'+svg('check',16)+'Checklist \u00b7 <span data-count="'+item.list+'">'+cnt(item.list)+' of 6</span></button>'+(item.list==='night'?'<button class="chipbtn" data-act="goal">'+svg('flag',16)+'Goal \u00b7 '+GOAL.done+' of 7 days</button>':'')+'</div>';
  return '<div class="it '+(cls||'')+'"><span class="tm">'+short(item.s)+'\u2013'+short(item.e)+'</span><div><span class="nm">'+esc(item.n)+'</span>'+a+'</div></div>';}
-function nextLine(next){if(!next)return '';var s2;
+function nextLine(next,tomorrow){
+ if(tomorrow)return '<div class="now-next"><span class="lbl">Next</span><span><b>'+esc(FIRST.n)+'</b><span class="s">Tomorrow, '+clock(FIRST.s)+'</span></span></div>';
+ if(!next)return '';var s2;
  if(next.travel)s2='Leave at '+clock(next.s);else s2=clock(next.s);s2+=' \u00b7 in '+dur(next.s-T);
- if(PH.id==='evening'){var n2=ALL[ALL.indexOf(next)+1];if(n2)s2+='<br>Then '+n2.n.toLowerCase()+' at '+clock(n2.s);}
+ if(T>=1230){var n2=ALL[ALL.indexOf(next)+1];if(n2)s2+='<br>Then '+n2.n.toLowerCase()+' at '+clock(n2.s);}
  return '<div class="now-next"><span class="lbl">Next</span><span><b>'+esc(next.n)+'</b><span class="s">'+s2+'</span></span></div>';}
 function renderNow(){
- var c=curNext(),cur=c.cur,next=c.next,prev=c.prev,title,sub='',range,left,pct;
+ var c=curNext(),cur=c.cur,next=c.next,prev=c.prev,title,sub='',range,left='',pct=null,tomorrow=false;
  if(cur){title=cur.n;range=short(cur.s)+' \u2013 '+clock(cur.e);left=(cur.e-T)+' min left';pct=(T-cur.s)/(cur.e-cur.s);
   if(cur.subject)sub='with '+SUBJ[cur.subject].teacher;}
- else if(next){title='Free time';range='Nothing planned until '+clock(next.s);left=dur(next.s-T)+' left';pct=prev?(T-prev.e)/(next.s-prev.e):0;}
- else{title='Day done';range='Lights out was at 9:45 PM';left='';pct=1;}
- pct=Math.max(.03,Math.min(1,pct));
- var h='<div class="now-head"><div class="now-top"><span class="live"><span class="dot"></span>Now \u00b7 '+clock(T)+'</span><span class="phase">'+svg(PH.icon,16)+PH.name+'</span></div><div class="now-title">'+esc(title)+'</div>'+(sub?'<div class="now-sub">'+esc(sub)+'</div>':'')+'<div class="now-time"><span>'+range+'</span><b>'+left+'</b></div><div class="bar" role="img" aria-label="'+(left||'Done')+'"><i style="width:'+Math.round(pct*100)+'%"></i></div>'+nextLine(next)+'</div>';
+ else if(!prev){title='Your day starts at '+clock(next.s);range='Nothing planned before then';left='in '+dur(next.s-T);}
+ else if(next&&inHW()&&openTasks().length){title='Homework time';range=short(HW[0])+' \u2013 '+clock(HW[1]);left=dur(HW[1]-T)+' left';pct=(T-HW[0])/(HW[1]-HW[0]);sub='Nothing else planned until dinner';}
+ else if(next){title='Free time';range='Until '+clock(next.s);left=dur(next.s-T)+' left';pct=(T-prev.e)/(next.s-prev.e);}
+ else{title='Day done';range='Lights out was at '+clock(LAST.s);tomorrow=true;}
+ var bar=pct==null?'':'<div class="bar" role="img" aria-label="'+left+'"><i style="width:'+Math.round(Math.max(.03,Math.min(1,pct))*100)+'%"></i></div>';
+ var h='<div class="now-head"><div class="now-top"><span class="live">'+clock(T)+'</span></div><div class="now-title">'+esc(title)+'</div>'+(sub?'<div class="now-sub">'+esc(sub)+'</div>':'')+'<div class="now-time"><span>'+range+'</span><b>'+left+'</b></div>'+bar+nextLine(prev||cur?next:null,tomorrow)+'</div>';
  h+=context(cur);
  if(S.expanded){
-  var earlier=ALL.filter(function(i){return i.e<=T;}),up=ALL.filter(function(i){return i.e>T;}),lp=null,nowShown=false;
+  var earlier=ALL.filter(function(i){return i.e<=T;}),up=ALL.filter(function(i){return i.e>T;}),nowShown=false;
   h+='<div class="day">';
   if(earlier.length){h+='<button class="earlier" data-act="earlier" aria-expanded="'+S.earlier+'"><span>Earlier today \u00b7 '+earlier.length+' '+(earlier.length===1?'activity':'activities')+'</span>'+svg('chev')+'</button>';
-   if(S.earlier){earlier.forEach(function(i){if(i.phase!==lp){h+='<div class="ph">'+svg(i.phase.icon)+i.phase.name+'</div>';lp=i.phase;}h+=row(i,'past');});lp=null;}}
-  up.forEach(function(i){if(i.phase!==lp){h+='<div class="ph">'+svg(i.phase.icon)+i.phase.name+'</div>';lp=i.phase;}
+   if(S.earlier){earlier.forEach(function(i){h+=row(i,'past');});}}
+  if(!up.length)h+='<p class="day-empty">Nothing else today. Tomorrow starts at '+clock(FIRST.s)+'.</p>';
+  up.forEach(function(i){
    if(!cur&&!nowShown&&i.s>T){h+='<div class="nowline"><b>Now \u00b7 '+clock(T)+'</b><i></i></div>';nowShown=true;}
    h+=row(i,i===cur?'cur':'');});
   h+='<div class="day-actions"><button data-act="page" data-page="Change my plan">+ Change my plan</button><button data-act="page" data-page="My calendar">Calendar '+svg('arrow',16)+'</button></div></div>';}
  h+='<button class="disclose" data-act="expand" aria-expanded="'+S.expanded+'"><span>'+(S.expanded?'Show less':'See the rest of my day')+'</span>'+svg('chev',20)+'</button>';
  $('now').innerHTML=h;$('app').classList.toggle('expanded',S.expanded);
 }
-function renderNeeds(){if($('owe'))setTimeout(renderOwe);
- var open=openTasks(),calm=PH.id==='school',noFirst=calm||PH.id==='evening',ndone=S.doneOrder.length;
- var h='<div class="hd"><h2>Needs you</h2>'+(open.length?'<span class="count" aria-label="'+open.length+' items">'+open.length+'</span>':'')+(calm?'<span class="aside">After school</span>':'')+'</div>';
- if(calm)h+='<p class="note-calm">Nothing here is due during class.</p>';
- if(!open.length)h+='<div class="empty">All caught up for now.</div>';
+function renderNeeds(){if($('owe'))setTimeout(function(){renderOwe();renderGreet();});
+ var open=openTasks(),calm=PH.id==='school'||T>=1260,noFirst=calm||T<870||T>=1230,ndone=S.doneOrder.length;
+ var h='<div class="hd"><h2>Needs you</h2>'+(open.length?'<span class="count" aria-label="'+open.length+' items">'+open.length+'</span>':'')+(PH.id==='school'?'<span class="aside">After school</span>':'')+'</div>';
+ 
+ if(!open.length)h+='<div class="empty">All done. Nice.</div>';
  open.forEach(function(t,k){var s=SUBJ[t.subject],fi=firstOpen(t),showFirst=!noFirst&&k===0&&fi>=0;
   h+='<button class="task" data-act="task" data-id="'+t.id+'" id="row-'+t.id+'"><span class="sw" style="background:'+s.color+'"></span><span class="tx"><span class="t">'+esc(t.title)+'</span><span class="m">'+s.name+' \u00b7 '+(t.soon&&!calm?'<b>'+t.due+'</b>':t.due)+' \u00b7 '+t.minutes+' min</span>'+(showFirst?'<span class="first">'+(fi===0?'First step: ':'Next step: ')+esc(t.steps[fi])+'</span>':'')+'</span>'+svg('right',20,'chev')+'</button>';});
  if(ndone)h+='<div class="donebar">'+svg('check',18)+ndone+' done today</div>';
- h+='<button class="all" data-act="allwork"><span>All my schoolwork</span>'+svg('arrow')+'</button>';
+ h+='<button class="all" data-act="allwork"><span>All schoolwork</span>'+svg('arrow')+'</button>';
  $('needs').classList.toggle('calm',calm);$('needs').innerHTML=h;
 }
 function renderMinute(){
- var h='<h3>When you have a minute</h3>';
- if(PH.id==='school')h+='<p class="calmline">The journal, brain teaser and chess puzzle open after school.</p>';
- else h+='<div class="chips"><button class="chip" data-act="journal"><span class="ic">'+svg('journal',20)+'</span><span>Gratitude journal<small>Write a moment</small></span></button><button class="chip" data-act="teaser"><span class="ic">'+svg('puzzle',20)+'</span><span>Brain teaser<small>'+(S.teaser.solved?'Solved today \u2713':'A little challenge')+'</small></span></button><button class="chip" data-act="chess"><span class="ic" style="font-size:20px" aria-hidden="true">\u265e</span><span>Chess puzzle<small>850 puzzle rating</small></span></button></div>';
+ var h='<h3>Extras</h3>';
+ if(PH.id==='school')h+='<p class="calmline">Extras open after school.</p>';
+ else h+='<div class="chips"><button class="chip" data-act="journal"><span class="ic">'+svg('journal',20)+'</span><span>Journal<small>One line about today</small></span></button><button class="chip" data-act="teaser"><span class="ic">'+svg('puzzle',20)+'</span><span>Brain teaser<small>'+(S.teaser.solved?'Solved \u2713':'Today\u2019s puzzle')+'</small></span></button><button class="chip" data-act="chess"><span class="ic" style="font-size:20px" aria-hidden="true">\u265e</span><span>Chess puzzle<small>Rated 850</small></span></button></div>';
  $('minute').innerHTML=h;
 }
 function renderOwe(){var o=openTasks(),soon=o.filter(function(t){return t.soon;}).length,e=$('owe');
- if(!o.length){e.innerHTML='<span>'+svg('check',18)+'Nothing due right now</span>';e.disabled=true;return;}e.disabled=false;
- e.innerHTML='<span class="n">'+o.length+'</span><span>'+(PH.id==='school'?'to do after school':'things need you')+(soon?(PH.id==='school'?' \u00b7 '+soon+' due tomorrow':' \u00b7 <b>'+soon+' due tomorrow</b>'):'')+'</span>'+svg('chev',20);}
-function render(){renderNow();renderNeeds();renderMinute();renderOwe();
+ if(!o.length){e.innerHTML='<span>'+svg('check',18)+'Nothing to do</span>';e.disabled=true;return;}e.disabled=false;
+ e.innerHTML='<span class="n">'+o.length+'</span><span>'+(PH.id==='school'?'to do after school':'to do')+(soon?((PH.id==='school'||T>=1260)?' \u00b7 '+soon+' due tomorrow':' \u00b7 <b>'+soon+' due tomorrow</b>'):'')+'</span>'+svg('chev',20);}
+function render(){renderGreet();renderNow();renderNeeds();renderMinute();renderOwe();
  $('different').innerHTML=DIFFERENT?'<div class="different" role="note">'+svg('flag',20)+'<span><b>Today is different.</b> '+esc(DIFFERENT.text)+'</span></div>':'';}
 /* sheets */
 var openTask=null,openList=null;
@@ -124,7 +160,7 @@ function allSheet(){var todo=TASKS.filter(function(t){return !S.done[t.id];}),dn
  function r(t){var s=SUBJ[t.subject];return '<button class="list-row" data-act="task" data-id="'+t.id+'"><span class="sw" style="background:'+s.color+'"></span><span class="tx"><span class="t">'+esc(t.title)+'</span><span class="m">'+s.name+' \u00b7 '+t.due+' \u00b7 '+t.minutes+' min</span></span>'+svg('right',20)+'</button>';}
  var b='<div class="sh-sec">To do \u00b7 '+todo.length+'</div>'+todo.map(r).join('')+(todo.length?'':'<p class="sh-meta">Nothing left to do.</p>')+'<div class="sh-sec">Done \u00b7 '+dn.length+'</div>'+dn.map(r).join('')+(dn.length?'':'<p class="sh-meta">Work you mark as done shows up here.</p>')+'<div class="note">In the full app this is the Classes &amp; work page, with grades and teacher feedback.</div>';
  sheet('All my schoolwork',b);}
-function listSheet(l){openList=l;openTask=null;var b=listBlock(l);if(l==='night')b+='<button class="goal-line" data-act="goal">'+svg('flag',18)+'<span>Packing your bag counts toward your goal \u00b7 '+GOAL.done+' of 7 days</span></button>';sheet(LISTS[l].title,b);}
+function listSheet(l){openList=l;openTask=null;var b=listBlock(l);if(l==='night')b+='<button class="goal-line" data-act="goal">'+svg('flag',18)+'<span>Goal: '+esc(GOAL.title.replace(/^./,function(c){return c.toLowerCase();}))+' \u00b7 '+GOAL.done+' of 7 days</span></button>';sheet(LISTS[l].title,b);}
 function goalSheet(){var d='';for(var i=0;i<GOAL.target;i++)d+='<i class="'+(i<GOAL.done?'on':'')+'"></i>';
  sheet('My goal','<p style="font-size:18px;font-weight:750">'+esc(GOAL.title)+'</p><div class="dots" role="img" aria-label="'+GOAL.done+' of 7 school days">'+d+'</div><div class="sh-meta">'+GOAL.done+' of '+GOAL.target+' school days</div><p>'+esc(GOAL.why)+'</p><div class="sh-sec">Next step</div><p>'+esc(GOAL.first)+'</p><div class="sh-sec">Reward</div><p>'+esc(GOAL.reward)+' <span class="sh-meta">(helper: '+GOAL.helper+')</span></p><div class="note">In the full app this opens My goals.</div>');}
 function teaserSheet(){var Z=S.teaser,b='<div class="sh-meta">'+TEASER.kind+' \u00b7 '+TEASER.title+'</div><p style="font-size:18px;font-weight:650">'+esc(TEASER.q)+'</p>';
@@ -151,7 +187,7 @@ document.addEventListener('click',function(e){
  if(a==='owe'){var n=$('needs');n.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});var f=n.querySelector('.task');if(f)f.focus({preventScroll:true});return;}
  if(a==='expand'){S.expanded=!S.expanded;save();renderNow();return;}
  if(a==='earlier'){S.earlier=!S.earlier;save();renderNow();return;}
- if(a==='ck'){var l=b.dataset.list,i=b.dataset.i,on=!S.checks[l][i];S.checks[l][i]=on;save();updateList(l);if(on){b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop');}if(on&&cnt(l)===6)toast(LISTS[l].title+' \u2713');return;}
+ if(a==='ck'){var l=b.dataset.list,i=b.dataset.i,on=!S.checks[l][i];S.checks[l][i]=on;save();updateList(l);renderGreet();if(on){b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop');}if(on&&cnt(l)===6)toast(LISTS[l].title+' \u2713');return;}
  if(a==='step'){S.steps[id]=S.steps[id]||{};var on2=!S.steps[id][b.dataset.i];S.steps[id][b.dataset.i]=on2;save();b.classList.toggle('on',on2);b.setAttribute('aria-checked',on2);if(on2){b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop');}
   var t=task(id),d=S.steps[id],nd=0;t.steps.forEach(function(_,k){if(d[k])nd++;});var hd=$('sheet').querySelector('.ctx-hd span');if(hd)hd.textContent=nd+' of '+t.steps.length;var mb=$('sheet').querySelector('[data-act=markdone]');if(mb)mb.classList.toggle('ok',nd===t.steps.length);renderNeeds();renderNow();return;}
  if(a==='markdone'){S.done[id]=true;S.doneOrder.push(id);save();close();var r=$('row-'+id);var fin=function(){renderNeeds();renderNow();var n=openTasks().length;toast(n?'Done \u2713 \u00b7 '+n+' left':'All caught up \u2713');};
@@ -174,6 +210,11 @@ document.addEventListener('click',function(e){
  if(a==='close'){close();return;}
  if(a==='reset'){S=fresh();save();render();toast('Demo reset');return;}
 });
+function theme(){document.documentElement.classList.toggle('dark',T<405||T>=1140);}
+function setTime(m){m=Math.round(m);if(!(m>=0&&m<1440)||m===T)return;T=m;PH=phaseAt(T);theme();renderGreet();renderNow();renderNeeds();renderMinute();renderOwe();
+ try{history.replaceState(null,'','?t='+(Math.floor(T/60)*100+T%60)+location.hash);}catch(e){}}
+window.addEventListener('message',function(e){if(e.origin!==location.origin)return;var d=e.data;if(d&&d.type==='aeios-time')setTime(+d.minutes);if(d&&d.type==='demoTime'&&/^\d{1,2}:\d{2}$/.test(d.t)){var p=d.t.split(':');setTime(+p[0]*60+(+p[1]));}});
+window.aeiosSetTime=setTime;
 document.addEventListener('keydown',function(e){if(e.key==='Escape')close();});
-render();
+theme();render();
 })();
