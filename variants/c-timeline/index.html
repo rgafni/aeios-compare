@@ -44,12 +44,12 @@ svg{flex:none}
 .hdr-in{max-width:1180px;margin:0 auto}
 .top{display:flex;align-items:center;gap:10px}
 .crest{width:34px;height:34px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px var(--surf)}
-.date{font-size:15px;font-weight:700;color:var(--muted)}
+.date{white-space:nowrap;font-size:15px;font-weight:700;color:var(--muted)}
 .spacer{flex:1}
-.pill{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border-radius:22px;background:var(--surf);box-shadow:var(--shadow);font-size:15px;font-weight:750;color:var(--ink)}
+.pill{flex:none;white-space:nowrap;display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border-radius:22px;background:var(--surf);box-shadow:var(--shadow);font-size:15px;font-weight:750;color:var(--ink)}
 .pill .ring{width:22px;height:22px}
 .pill.all{color:var(--ok)}
-.avbtn{width:44px;height:44px;border-radius:50%;overflow:hidden;display:grid;place-items:center;box-shadow:var(--shadow)}
+.avbtn{flex:none;width:44px;height:44px;border-radius:50%;overflow:hidden;display:grid;place-items:center;box-shadow:var(--shadow)}
 .avbtn img{width:44px;height:44px}
 h1{font-size:27px;line-height:1.15;font-weight:800;letter-spacing:-.8px;margin-top:12px;max-width:22ch;text-wrap:balance}
 .sub{display:flex;align-items:center;gap:8px;margin-top:6px;font-size:15px;font-weight:650;color:var(--muted)}
@@ -320,6 +320,8 @@ function segments(){
 }
 function curNext(){var cur=null,next=null,prev=null;BL.forEach(function(b){if(b.s<=T&&T<b.e)cur=b;if(b.e<=T)prev=b;if(!next&&b.s>T)next=b;});return {cur:cur,next:next,prev:prev};}
 function openTodos(){return TASKS.filter(function(t){return !isDone(t.id);});}
+/* single source of truth for the badge and every "done/nothing due" claim */
+function openReq(){return openTodos().filter(function(t){return t.required;});}
 
 /* ===== headline: short, human, time-aware ===== */
 function headline(segs){
@@ -328,6 +330,7 @@ function headline(segs){
  if(!cur&&!next)return ['That\u2019s a wrap. Sleep well.','Tomorrow starts at '+clock(BL[0].s)+'.'];
  if(!cur){
   var g=segs.filter(function(g){return g.kind==='gap'&&g.s<=T&&T<g.e;})[0],todos=(g&&g.chips||[]).filter(function(x){return !x.p.fun&&!isDone(x.p.id);});
+  var reqT=todos.filter(function(x){return task(x.p.id).required;});if(reqT.length)todos=reqT;
   var started=(g&&g.chips||[]).some(function(x){return !x.p.fun&&(isDone(x.p.id)||x.t<=T);});
   if(todos.length&&todos.every(function(x){return !task(x.p.id).required;}))return ['Free till '+hm(next.s)+'.','Equation notes, if you feel like it. ~'+task(todos[0].p.id).minutes+' min.'];
   if(todos.length){var sum=todos.reduce(function(a,x){return a+task(x.p.id).minutes;},0),first=todos[0];
@@ -335,7 +338,7 @@ function headline(segs){
    if(todos.length===1)return ['Just the '+task(first.p.id).short+' left. ~'+sum+' min.',next.n+' at '+clock(next.s)+'.'];
    return ['~'+sum+' min of homework, then '+next.n.toLowerCase()+'.',(first.t>T+4?'Next up at '+hm(first.t)+': ':'Start with the ')+task(first.p.id).short+'.'];}
   if(next.travel)return ['Leave at '+hm(next.s)+'.','Got everything?'];
-  if(next.s-T>=15)return ['Free till '+hm(next.s)+'. Nothing due.',next.n+' after that.'];
+  if(next.s-T>=15)return ['Free till '+hm(next.s)+'.'+(openReq().length?'':' Nothing due.'),next.n+' after that.'];
   return [next.n+' at '+hm(next.s)+'.','Free for '+dur(next.s-T)+'.'];
  }
  var nx=next?next.n:'',nxs=next?hm(next.s):'';
@@ -349,11 +352,11 @@ function headline(segs){
   case 'Travel home':return ['Heading home. Snack\u2019s next.','Home around '+hm(cur.e)+'.'];
   case 'Snack & decompress':return ['Snack. Do nothing for a bit.',left+' min, then math corrections.'];
   case 'Review math corrections':return [left<=10?left+' more min of math. Then piano.':'Math corrections, then piano.','Piano at '+nxs+'.'];
-  case 'Piano practice':return ['Piano till '+hm(cur.e)+'. Then you\u2019re free.',left+' min left.'];
+  case 'Piano practice':return ['Piano till '+hm(cur.e)+'. Then a break.',left+' min left.'];
   case 'Dinner':return ['Dinner. Nothing else till '+hm(next.s)+'.','Then '+nx.toLowerCase()+'.'];
   case 'Read a chapter':return ['Reading till '+hm(cur.e)+'.','Free after that.'];
-  case 'Get ready for tomorrow':var m=6-cnt('night');return [m?'Pack for tomorrow, then you\u2019re done.':'All packed. Quiet time at '+nxs+'.',m?m+' quick things.':'Nice.'];
-  case 'Reading & quiet time':return ['Wind down. Lights out at '+nxs+'.','Screens away, book out.'];
+  case 'Get ready for tomorrow':var m=6-cnt('night');return [m?(openReq().length?'Pack your bag for tomorrow.':'Pack for tomorrow, then you\u2019re done.'):'All packed. Quiet time at '+nxs+'.',m?m+' quick things.':'Nice.'];
+  case 'Reading & quiet time':return ['Wind down. Lights out at '+nxs+'.','Reading & quiet time.'];
   case 'Lights out':return ['Lights out. Night, Maya.','See you at 6:45.'];
  }
  var nm=cur.hl||cur.n;
@@ -397,10 +400,10 @@ function render(scroll){
  $('headline').textContent=H[0];
  $('sub').innerHTML='<span class="live"><span class="dot" aria-hidden="true"></span>'+clock(T)+'</span>'+(H[1]?'<span aria-hidden="true">\u00b7</span><span>'+esc(H[1])+'</span>':'');
  /* to-do pill */
- var open=openTodos().filter(function(t){return t.required;});
+ var open=openReq();
  $('todoPill').className='pill'+(open.length?'':' all');
- $('todoPill').innerHTML=open.length?ring(TASKS.filter(function(t){return t.required;}).length-open.length,3)+'<span>'+open.length+' to do</span>':'<span>\u2713 All done</span>';
- $('todoPill').setAttribute('aria-label',open.length?open.length+' to-dos left today. Jump to the next one':'All to-dos done');
+ $('todoPill').innerHTML=open.length?ring(TASKS.filter(function(t){return t.required;}).length-open.length,3)+'<span>'+open.length+' homework</span>':'<span>\u2713 Homework done</span>';
+ $('todoPill').setAttribute('aria-label',open.length?open.length+' homework left today. Jump to the next one':'Homework done for today');
  /* river */
  var h='<div class="rail" aria-hidden="true"><div class="stream"></div><div class="stream-past" id="past"></div><div id="hrs"></div></div><div class="col" id="col">';
  segs.forEach(function(g,i){
@@ -423,7 +426,7 @@ function render(scroll){
  });
  h+='</div><div class="now" id="now" aria-hidden="true"><div class="ln"></div><div class="orb"></div><div class="tag" id="nowTag"></div></div>';
  $('river').innerHTML=h;
- $('end').innerHTML=T>=1305?'<div class="endnote"><b>Tomorrow, Fri Oct 9</b>Wake-up at 6:45. '+(openTodos().filter(function(t){return t.soon;}).length?'Still open for tomorrow: '+openTodos().filter(function(t){return t.soon;}).map(function(t){return t.short;}).join(', ')+'.':'Everything due tomorrow is done \u2713')+'</div>':'';
+ $('end').innerHTML=T>=1305?'<div class="endnote"><b>Tomorrow, Fri Oct 9</b>Wake-up at 6:45. '+(openReq().length?'Still open: '+openReq().map(function(t){return t.short;}).join(', ')+'.':'Homework\u2019s all done \u2713')+'</div>':'';
  layoutRail();
  renderAside();
  if(scroll)scrollToNow(!RM.matches&&scroll==='smooth');
@@ -508,7 +511,7 @@ document.addEventListener('click',function(e){
   var H=headline(SEGS);$('headline').textContent=H[0];
   if(on&&cnt(l)===6)toast(LISTS[l].title+' \u2713');return;}
  if(a==='toggle'){var was=isDone(id);S.done[id]=!was;save();keepScroll(function(){render();});refreshSheet();
-  if(!was){var n=openTodos().filter(function(t){return t.required;}).length;toast((n?task(id).short.charAt(0).toUpperCase()+task(id).short.slice(1)+' done':'That\u2019s everything')+' \u2713',function(){S.done[id]=was;save();keepScroll(function(){render();});refreshSheet();});}
+  if(!was){var n=openReq().length;toast((n?task(id).short.charAt(0).toUpperCase()+task(id).short.slice(1)+' done':'Homework\u2019s done')+' \u2713',function(){S.done[id]=was;save();keepScroll(function(){render();});refreshSheet();});}
   return;}
  if(a==='undo'){if(undoFn)undoFn();undoFn=null;$('toast').classList.remove('show');return;}
  if(a==='step'){S.steps[id]=S.steps[id]||{};S.steps[id][b.dataset.i]=!S.steps[id][b.dataset.i];save();taskSheet(id);return;}
@@ -525,7 +528,7 @@ document.addEventListener('click',function(e){
  if(a==='ph'){phSheet(b.dataset.p);return;}
  if(a==='reset'){S=fresh();save();close();render(true);toast('Demo reset');return;}
  if(a==='jumpnow'){follow=true;scrollToNow(!RM.matches);return;}
- if(a==='nexttodo'){var o=openTodos().filter(function(t){return t.required;})[0];var el=o&&$('chip-'+o.id);if(!el){toast('Nothing left to do today \u2713');return;}
+ if(a==='nexttodo'){var o=openReq()[0];var el=o&&$('chip-'+o.id);if(!el){toast('No homework left today \u2713');return;}
   var y=el.getBoundingClientRect().top+window.scrollY-hdrH()-(window.innerHeight-hdrH())*0.35;follow=false;window.scrollTo({top:y,behavior:RM.matches?'auto':'smooth'});
   el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash');return;}
 });
