@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#182b4b">
+<title>AEIOS Today · compare 3 versions</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#182b4b;font-family:Manrope,-apple-system,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+body{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
+.bar{flex:none;position:sticky;top:0;z-index:10;background:linear-gradient(115deg,#182b4b,#243e63);color:#fff;padding:calc(8px + env(safe-area-inset-top)) calc(10px + env(safe-area-inset-right)) 8px calc(10px + env(safe-area-inset-left));display:flex;align-items:center;gap:8px}
+.tabs{flex:1;display:flex;gap:4px;background:rgba(255,255,255,.12);border-radius:14px;padding:4px;max-width:560px;margin:0 auto}
+.tabs button{flex:1;min-height:48px;border:0;border-radius:11px;background:none;color:#dfe9f3;font:inherit;font-size:17px;font-weight:750;cursor:pointer}
+.tabs button[aria-selected=true]{background:#fff;color:#182b4b;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.open{flex:none;width:48px;height:48px;border-radius:12px;display:grid;place-items:center;color:#fff;background:rgba(255,255,255,.12);text-decoration:none}
+.stage{flex:1;position:relative;background:#f2f3f7}
+.stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:none;background:#f2f3f7}
+.stage iframe.on{display:block}
+.note{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);font-size:16px;color:#59606a}
+</style>
+</head>
+<body>
+<div class="bar">
+  <div class="tabs" role="tablist" aria-label="Version">
+    <button role="tab" id="t-mine" data-tab="mine" aria-selected="false">Mine</button>
+    <button role="tab" id="t-james" data-tab="james" aria-selected="false">James</button>
+    <button role="tab" id="t-new" data-tab="new" aria-selected="true">New</button>
+  </div>
+  <a class="open" id="open" href="new/" target="_blank" rel="noopener" aria-label="Open this version in a new tab"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></a>
+</div>
+<div class="stage" id="stage"><div class="note">Loading…</div></div>
+<script>
+(function(){
+var SRC={mine:'https://aeios2027.netlify.app/',james:'james/',new:'new/'};
+var TITLE={mine:'Mine: live student Today page',james:'James: Day View mockup',new:'New: compromise'};
+var frames={};
+function show(tab){
+  if(!SRC[tab])tab='new';
+  if(!frames[tab]){var f=document.createElement('iframe');f.src=SRC[tab];f.title=TITLE[tab];f.setAttribute('allow','clipboard-write');document.getElementById('stage').appendChild(f);frames[tab]=f;}
+  for(var k in frames)frames[k].classList.toggle('on',k===tab);
+  [].forEach.call(document.querySelectorAll('.tabs button'),function(b){b.setAttribute('aria-selected',b.dataset.tab===tab);});
+  document.getElementById('open').href=SRC[tab];
+  if(location.hash!=='#'+tab)history.replaceState(null,'','#'+tab);
+}
+document.querySelector('.tabs').addEventListener('click',function(e){var b=e.target.closest('button');if(b)show(b.dataset.tab);});
+show((location.hash||'#new').slice(1));
+})();
+</script>
+</body>
+</html>

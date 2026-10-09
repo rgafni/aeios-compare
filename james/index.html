@@ -1,0 +1,690 @@
+<!doctype html>
+<html><head><!-- frame-runtime --><!-- /frame-runtime --><meta charset="utf8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>AEIOS Day View</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400..800&amp;display=swap">
+<style>
+/* Layout: one fluid page; schedule (morning / afternoon / evening) + "to plan" side by side on wide screens, stacked on phones; priority view as wrapping columns */
+:root {
+  --bg: #F3F4F9;
+  --surface: #FFFFFF;
+  --surface-2: #F6F7FC;
+  --surface-3: #EEF1FA;
+  --tint: #E9ECF7;
+  --seg: #E6E9F3;
+  --fg: #1E2A44;
+  --muted: #5B6478;
+  --icon-muted: #6B7387;
+  --line: #E3E7F2;
+  --border: #D3D8E8;
+  --border-2: #C7CDE6;
+  --accent: #2B3A8C;
+  --on-accent: #FFFFFF;
+  --band: #24345A;
+  --band-fg: #FFFFFF;
+  --band-muted: #C9D1EA;
+  --high: #A63F08;
+  --high-bg: #FCE8D9;
+  --med: #2B3A8C;
+  --med-bg: #E7EBFA;
+  --med-fill: #C5CEF4;
+  --ok: #1F6B45;
+  --font: 'Manrope', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11162A; --surface: #1A2139; --surface-2: #161D33; --surface-3: #212A48; --tint: #212A48; --seg: #222B47;
+    --fg: #E6E9F5; --muted: #A3ABC2; --icon-muted: #959DB6; --line: #2A3352; --border: #2E3756; --border-2: #3A4468;
+    --accent: #A9B8FF; --on-accent: #11162A; --band: #2A3A66; --band-fg: #FFFFFF; --band-muted: #C9D1EA;
+    --high: #FFB08A; --high-bg: #4A2414; --med: #B9C5FF; --med-bg: #26305A; --med-fill: #4D5A99; --ok: #8FD9B1;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11162A; --surface: #1A2139; --surface-2: #161D33; --surface-3: #212A48; --tint: #212A48; --seg: #222B47;
+  --fg: #E6E9F5; --muted: #A3ABC2; --icon-muted: #959DB6; --line: #2A3352; --border: #2E3756; --border-2: #3A4468;
+  --accent: #A9B8FF; --on-accent: #11162A; --band: #2A3A66; --band-fg: #FFFFFF; --band-muted: #C9D1EA;
+  --high: #FFB08A; --high-bg: #4A2414; --med: #B9C5FF; --med-bg: #26305A; --med-fill: #4D5A99; --ok: #8FD9B1;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 15px; line-height: 1.4; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+svg { display: block; }
+.wrap { max-width: 1200px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 40px; display: flex; flex-direction: column; gap: 18px; }
+
+/* top bar */
+.top { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.icon-btn { width: 44px; height: 44px; flex-shrink: 0; border: 1px solid var(--border-2); background: var(--surface); display: flex; align-items: center; justify-content: center; }
+.icon-btn.round { border-radius: 22px; }
+.icon-btn.sq { border-radius: 12px; }
+.caption { flex: 1 1 220px; min-width: 0; color: var(--muted); font-size: 14px; }
+.seg { display: flex; padding: 3px; background: var(--seg); border: 1px solid var(--border); border-radius: 14px; min-width: 0; }
+.seg button { flex: 1; height: 44px; padding: 0 12px; border: 0; border-radius: 11px; background: transparent; color: var(--muted); font-size: 14px; font-weight: 600; white-space: nowrap; }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--accent); font-weight: 700; }
+.roles { flex: 1 1 320px; max-width: 420px; }
+.roles button { padding: 0 8px; }
+.journal { height: 50px; padding: 0 16px 0 10px; border: 1px solid var(--border-2); border-radius: 14px; background: var(--tint); color: var(--accent); font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+.journal .ib { width: 32px; height: 32px; border: 1px solid var(--border-2); border-radius: 9px; background: var(--surface-2); display: flex; align-items: center; justify-content: center; }
+
+/* day band */
+.band { padding: 18px 22px; border-radius: 20px; background: var(--band); color: var(--band-fg); display: flex; flex-wrap: wrap; align-items: center; gap: 12px 28px; }
+.eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; color: var(--band-muted); }
+.part { font-size: 32px; font-weight: 700; line-height: 1.15; }
+.datenav { display: flex; align-items: center; margin-left: -12px; }
+.datenav button { width: 44px; height: 44px; border: 0; background: transparent; color: var(--band-fg); display: flex; align-items: center; justify-content: center; }
+.datenav span { font-size: 16px; font-weight: 500; }
+.band-right { margin-left: auto; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.pill { padding: 7px 12px; border-radius: 999px; font-size: 13.5px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.pill.soft { background: rgba(255,255,255,0.12); color: var(--band-fg); }
+.pill.high { background: #FCE8D9; color: #8A3306; font-weight: 700; }
+.ghost { height: 44px; padding: 0 14px; border: 1px solid rgba(255,255,255,0.4); border-radius: 12px; background: rgba(255,255,255,0.08); color: var(--band-fg); font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+
+/* controls */
+.controls { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.views { flex: 0 1 280px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { height: 44px; padding: 0 14px; border: 1px solid var(--border-2); border-radius: 999px; background: var(--surface); color: var(--accent); font-size: 13.5px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.chip b { font-weight: 800; font-variant-numeric: tabular-nums; }
+.chip[aria-pressed="true"] { background: var(--band); border-color: var(--band); color: #FFFFFF; }
+.actions { margin-left: auto; display: flex; flex-wrap: wrap; gap: 8px; }
+.primary { height: 44px; padding: 0 16px; border: 0; border-radius: 12px; background: var(--accent); color: var(--on-accent); font-size: 14px; font-weight: 700; }
+.secondary { height: 44px; padding: 0 14px; border: 1px solid var(--border-2); border-radius: 12px; background: var(--surface); color: var(--accent); font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+
+/* content */
+.board { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 20px; }
+.card { min-width: 0; border: 1px solid var(--border); border-radius: 20px; background: var(--surface); overflow: hidden; }
+.card.schedule { flex: 999 1 520px; }
+.card.toplan { flex: 1 1 320px; }
+.card.col { flex: 1 1 290px; }
+.card.wide { flex: 1 1 100%; }
+.card-head { padding: 16px 20px 12px; display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; }
+.card-head h2 { margin: 0; font-size: 17px; font-weight: 800; text-wrap: balance; }
+.card-head p { margin: 0; font-size: 13px; color: var(--muted); }
+.col-head { padding: 16px 20px 12px; display: flex; align-items: center; gap: 8px; }
+.col-head h2 { margin: 0; flex: 1; font-size: 17px; font-weight: 800; }
+.col-head .n { font-size: 14px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.empty { padding: 14px 20px 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13.5px; }
+
+.sec { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 10px; width: 100%; min-height: 54px; padding: 8px 20px; border: 0; border-top: 1px solid var(--border); background: var(--surface); color: var(--fg); text-align: left; }
+.sec .name { font-size: 15px; font-weight: 800; }
+.sec .range { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.sec .nowtag { padding: 2px 8px; border-radius: 999px; background: var(--accent); color: var(--on-accent); font-size: 11px; font-weight: 700; }
+.sec .sum { margin-left: auto; font-size: 13px; color: var(--muted); }
+.sec .chev { color: var(--accent); transition: transform 0.15s ease; }
+.sec[aria-expanded="true"] .chev, .group[aria-expanded="true"] .chev { transform: rotate(180deg); }
+
+.plan { display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 0 12px 0 20px; border-top: 1px solid var(--line); }
+.plan .time { width: 120px; flex-shrink: 0; font-size: 13px; font-weight: 500; color: var(--muted); font-variant-numeric: tabular-nums; }
+.plan .title { flex: 1; min-width: 0; font-size: 16px; font-weight: 700; }
+.past .title { color: var(--muted); }
+.now { display: flex; align-items: center; gap: 8px; padding: 6px 20px; }
+.now span { padding: 3px 9px; border-radius: 999px; background: var(--accent); color: var(--on-accent); font-size: 11.5px; font-weight: 700; white-space: nowrap; }
+.now i { flex: 1; height: 2px; border-radius: 2px; background: var(--accent); }
+.group { display: flex; align-items: center; gap: 8px; width: 100%; height: 48px; padding: 0 20px; border: 0; border-top: 1px solid var(--line); background: var(--surface-3); color: var(--accent); text-align: left; }
+.group .lbl { font-size: 13.5px; font-weight: 700; }
+.group .cnt { flex: 1; font-size: 13px; font-weight: 600; color: var(--muted); }
+.group .chev { transition: transform 0.15s ease; }
+.nested { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); column-gap: 20px; padding: 4px 12px 8px; background: var(--surface-2); }
+.entry { display: flex; align-items: center; gap: 4px; min-height: 52px; padding: 0 12px 0 8px; border-top: 1px solid var(--line); }
+.entry.ro { padding-left: 20px; gap: 12px; }
+.nested .entry { border-top: 0; padding: 0; }
+.entry .body { flex: 1; min-width: 0; padding: 6px 0; display: flex; flex-direction: column; gap: 1px; }
+.entry .title { font-size: 15.5px; font-weight: 600; }
+.entry .meta { font-size: 12.5px; color: var(--muted); }
+.entry.done .title { color: var(--muted); text-decoration: line-through; }
+.status { font-size: 12.5px; font-weight: 700; color: var(--muted); white-space: nowrap; }
+.status.ok { color: var(--ok); }
+.check { width: 44px; height: 44px; flex-shrink: 0; padding: 0; border: 0; background: transparent; display: flex; align-items: center; justify-content: center; }
+.check .box { width: 22px; height: 22px; border: 2px solid var(--icon-muted); border-radius: 7px; background: var(--surface); color: #FFFFFF; display: flex; align-items: center; justify-content: center; }
+.check .box svg { visibility: hidden; }
+.done .check .box { background: var(--band); border-color: var(--band); }
+.done .check .box svg { visibility: visible; }
+.clock { width: 44px; height: 44px; flex-shrink: 0; color: var(--muted); display: flex; align-items: center; justify-content: center; }
+
+.flag { min-width: 44px; height: 44px; flex-shrink: 0; padding: 0 10px; border: 0; border-radius: 12px; background: transparent; color: var(--icon-muted); font-size: 12.5px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.flag svg { fill: none; }
+.flag[data-p="1"] { background: var(--med-bg); color: var(--med); }
+.flag[data-p="1"] svg { fill: var(--med-fill); }
+.flag[data-p="2"] { background: var(--high-bg); color: var(--high); }
+.flag[data-p="2"] svg { fill: currentColor; }
+button.flag:hover { filter: brightness(0.97); }
+span.flag { height: 32px; min-width: 0; padding: 0 9px; border-radius: 9px; }
+span.flag.locked { gap: 4px; }
+.lock { opacity: 0.85; }
+.more { padding: 0 12px 4px; border-top: 1px solid var(--line); }
+.how { margin: 0; padding: 0 20px 12px; font-size: 13px; color: var(--muted); }
+
+.foot { padding-top: 12px; border-top: 1px solid var(--border); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; color: var(--muted); font-size: 13px; }
+.linkish { height: 44px; padding: 0 4px; border: 0; background: transparent; color: var(--accent); font-size: 13px; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+
+@media (max-width: 520px) {
+  .band { padding: 16px 18px; }
+  .part { font-size: 28px; }
+  .band-right { margin-left: 0; }
+  .roles { max-width: none; }
+  .roles button { font-size: 13px; }
+  .views { flex: 1 1 100%; }
+  .actions { margin-left: 0; width: 100%; }
+  .actions button { flex: 1; justify-content: center; }
+  .plan { padding: 0 8px 0 14px; gap: 8px; }
+  .plan .time { width: 84px; font-size: 12px; }
+  .plan .title { font-size: 15.5px; }
+  .sec { padding-inline: 14px; }
+  .sec .sum { margin-left: 0; flex: 1 1 100%; }
+  .card-head, .col-head { padding-inline: 14px; }
+  .entry.ro { padding-left: 14px; }
+  .flag .lbl { display: none; }
+  span.flag .lbl { display: inline; }
+}
+@media (prefers-reduced-motion: reduce) { .sec .chev, .group .chev { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <button class="icon-btn round" type="button" aria-label="Menu">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16"></path><path d="M4 12h16"></path><path d="M4 17h16"></path></svg>
+    </button>
+    <button class="icon-btn sq" type="button" aria-label="AEIOS home">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="8.5" cy="8.5" r="4.5"></circle><circle cx="15.5" cy="8.5" r="4.5"></circle><circle cx="12" cy="15" r="4.5"></circle></svg>
+    </button>
+    <div class="caption" id="caption">Sample day · Plans and checklists are editable</div>
+    <div class="seg roles" role="group" aria-label="Role">
+      <button type="button" id="role-student" data-action="role" data-role="student" aria-pressed="true">Student</button>
+      <button type="button" id="role-parent" data-action="role" data-role="parent" aria-pressed="false">Parent</button>
+      <button type="button" id="role-teacher" data-action="role" data-role="teacher" aria-pressed="false">Teacher</button>
+      <button type="button" id="role-admin" data-action="role" data-role="admin" aria-pressed="false">Admin</button>
+    </div>
+    <button class="journal" type="button">
+      <span class="ib"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18H6z"></path><path d="M9 3v18"></path><path d="M12 9h3"></path></svg></span>
+      <span>Gratitude journal</span>
+    </button>
+  </header>
+
+  <section class="band" aria-label="Right now">
+    <div>
+      <div class="eyebrow">RIGHT NOW · 7:49 PM</div>
+      <div class="part">Evening</div>
+    </div>
+    <div class="datenav">
+      <button type="button" aria-label="Previous day"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></button>
+      <span>Wednesday, October 7</span>
+      <button type="button" aria-label="Next day"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></button>
+    </div>
+    <div class="band-right" id="band-right">
+      <div class="pill soft" id="sum-done">4 of 18 tasks done</div>
+      <div class="pill high">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4"></path><path d="M5 4h13l-3 4.5 3 4.5H5z"></path></svg>
+        <span id="sum-high">3 high priority left</span>
+      </div>
+      <button class="ghost" type="button" id="fullday" data-action="fullday" aria-pressed="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg><span>Full day</span></button>
+    </div>
+  </section>
+
+  <div class="controls" id="controls">
+    <div class="seg views" role="group" aria-label="View">
+      <button type="button" id="view-time" data-action="view" data-view="time" aria-pressed="true">By time</button>
+      <button type="button" id="view-priority" data-action="view" data-view="priority" aria-pressed="false">By priority</button>
+    </div>
+    <div class="chips" id="chips" role="group" aria-label="Show"><button class="chip" type="button" data-action="filter" data-filter="all" aria-pressed="true"><span>All</span><b>30</b></button><button class="chip" type="button" data-action="filter" data-filter="plans" aria-pressed="false"><span>Plans</span><b>12</b></button><button class="chip" type="button" data-action="filter" data-filter="check" aria-pressed="false"><span>Checklist</span><b>10</b></button><button class="chip" type="button" data-action="filter" data-filter="work" aria-pressed="false"><span>Work &amp; responsibilities</span><b>8</b></button></div>
+    <div class="actions">
+      <button class="primary" type="button">+ Add an item</button>
+      <button class="secondary" type="button">
+        <span>Calendar</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg>
+      </button>
+    </div>
+  </div>
+
+  <main class="board" id="board" aria-live="polite"><section class="card schedule"><div class="card-head"><h2>Schedule</h2><p>Checklists sit inside the plan they belong to</p></div><button class="sec" type="button" data-action="sec" data-sec="morning" aria-expanded="false"><span class="name">Morning</span><span class="range">6:45–11:45 am</span><span class="sum">3 plans · checklist 4 of 4</span><svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button><button class="sec" type="button" data-action="sec" data-sec="afternoon" aria-expanded="false"><span class="name">Afternoon</span><span class="range">11:45 am–5:00 pm</span><span class="sum">4 plans</span><svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button><button class="sec" type="button" data-action="sec" data-sec="evening" aria-expanded="true"><span class="name">Evening</span><span class="range">6:15–9:45 pm</span><span class="nowtag">Now</span><span class="sum">5 plans · checklist 0 of 6</span><svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button><div class="plan past"><div class="time">6:15–6:45 pm</div><div class="title">Dinner</div><button class="flag" type="button" data-action="flag" data-id="dinner" data-p="0" aria-label="Dinner: priority none. Change priority"><svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4"></path><path d="M5 4h13l-3 4.5 3 4.5H5z"></path></svg></button></div><div class="plan past"><div class="time">7:10–7:30 pm</div><div class="title">Read a chapter</div><button class="flag" type="button" data-action="flag" data-id="chapter" data-p="1" aria-label="Read a chapter: priority medium. Change priority"><svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4"></path><path d="M5 4h13l-3 4.5 3 4.5H5z"></path></svg><span class="lbl">Med</span></button></div><div class="now"><span>Now · 7:49 pm</span><i></i></div><div class="plan"><div class="time">8:30–9:00 pm</div><div class="title">Get ready for tomorrow</div><button class="flag" type="button" data-action="flag" data-id="ready" data-p="0" aria-label="Get ready for tomorrow: priority none. Change priority"><svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4"></path><path d="M5 4h13l-3 4.5 3 4.5H5z"></path></svg></button></div><button class="group" type="button" data-action="group" data-group="g-night" aria-expanded="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11"></path><path d="M9 12h11"></path><path d="M9 18h11"></path><path d="M4 6h.01"></path><path d="M4 12h.01"></path><path d="M4 18h.01"></path></svg><span class="lbl">Nighttime checklist</span><span class="cnt">0 of 6 ready</span><svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button><div class="nested"><div class="entry"><button class="check" type="button" data-action="check" data-id="backpack" aria-pressed="false" aria-label="Mark done: Pack backpack"><span class="box"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span></button><div class="body"><div class="title">Pack backpack</div><div class="meta">Priority set by your parent</div></div><span class="flag locked" data-p="2" role="img" aria-label="Pack backpack: priority high, set by your parent"><svg class="lock" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg><svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4"></path><path d="M5 4h13l-3 4.5 3 4.5H5z"></path></svg><span class="lbl">High</span></span></div><div class="entry"><button class="check" type="button" data-action="check" data-id="clothes" aria-pressed="false" aria-label="Mark done: Lay out clothes"><span class="box"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span></button><div class="body"><div class="title">Lay out clothes</div></div><button class="flag" type="button" data-action="flag" data-id="clothes" data-p="0" aria-label="Lay out clothes: priority none. Change priority"><svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4"></path><path d="M5 4h13l-3 4.5 3 4.5H5z"></path></svg></button></div><div class="entry"><button class="check" type="button" data-action="check" data-id="laptop" aria-pressed="false" aria-label="Mark done: Charge laptop"><span class="box"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span></button><div class="body"><div class="title">Charge laptop</div></div><button class="flag" type="button" data-action="flag" data-id="laptop" data-p="1" aria-label="Charge laptop: priority medium. Change priority"><svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4"></path><path d="M5 4h13l-3 4.5 3 4.5H5z"></path></svg><span class="lbl">Med</span></button></div><div class="entry"><button class="check" type="button" data-action="check" data-id="water" aria-pressed="false" aria-label="Mark done: Fill water bottle"><span class="box"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span></button><div class="body"><div class="title">Fill water bottle</div></div><button class="flag" type="button" data-action="flag" data-id="water" data-p="0" aria-label="Fill water bottle: priority none. Change priority"><svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4"></path><path d="M5 4h13l-3 4.5 3 4.5H5z"></path></svg></button></div><div class="entry"><button class="check" type="button" data-action="check" data-id="teeth" aria-pressed="false" aria-label="Mark done: Brush teeth"><span class="box"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span></button><div class="body"><div class="title">Brush teeth</div></div><button class="flag" type="button" data-action="flag" data-id="teeth" data-p="0" aria-label="Brush teeth: priority none. Change priority"><svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4"></path><path d="M5 4h13l-3 4.5 3 4.5H5z"></path></svg></button></div><div class="entry"><button class="check" type="button" data-action="check" data-id="alarm" aria-pressed="false" aria-label="Mark done: Set alarm"><span class="box"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span></button><div class="body"><div class="title">Set alarm</div></div><button class="flag" type="button" data-action="flag" data-id="alarm" data-p="0" aria-label="Set alarm: priority none. Change priority"><svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4"></path><path d="M5 4h13l-3 4.5 3 4.5H5z"></path></svg></button></div></div><div class="plan"><div class="time">9:00–9:30 pm</div><div class="title">Reading &amp; quiet time</div><button class="flag" type="button" data-action="flag" data-id="quiet" data-p="0" aria-label="Reading &amp; quiet time: priority none. Change priority"><svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4"></path><path d="M5 4h13l-3 4.5 3 4.5H5z"></path></svg></button></div><div class="plan"><div class="time">9:30–9:45 pm</div><div class="title">Lights out</div><button class="flag" type="button" data-action="flag" data-id="lights" data-p="0" aria-label="Lights out: priority none. Change priority"><svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4"></path><path d="M5 4h13l-3 4.5 3 4.5H5z"></path></svg></button></div></section><section class="card toplan"><div class="card-head"><div><h2>To plan · 8</h2><p>Not on the schedule yet. Flagged items come first.</p></div></div><div class="entry"><button class="check" type="button" data-action="check" data-id="math" aria-pressed="false" aria-label="Mark done: Math worksheet"><span class="box"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span></button><div class="body"><div class="title">Math worksheet</div><div class="meta">Priority set by your teacher</div></div><span class="flag locked" data-p="2" role="img" aria-label="Math worksheet: priority high, set by your teacher"><svg class="lock" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg><svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4"></path><path d="M5 4h13l-3 4.5 3 4.5H5z"></path></svg><span class="lbl">High</span></span></div><div class="entry"><button class="check" type="button" data-action="check" data-id="lab" aria-pressed="false" aria-label="Mark done: Science lab write-up"><span class="box"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span></button><div class="body"><div class="title">Science lab write-up</div><div class="meta">Priority set by your teacher</div></div><span class="flag locked" data-p="2" role="img" aria-label="Science lab write-up: priority high, set by your teacher"><svg class="lock" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg><svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4"></path><path d="M5 4h13l-3 4.5 3 4.5H5z"></path></svg><span class="lbl">High</span></span></div><div class="entry"><button class="check" type="button" data-action="check" data-id="spelling" aria-pressed="false" aria-label="Mark done: Study spelling list"><span class="box"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span></button><div class="body"><div class="title">Study spelling list</div></div><button class="flag" type="button" data-action="flag" data-id="spelling" data-p="1" aria-label="Study spelling list: priority medium. Change priority"><svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4"></path><path d="M5 4h13l-3 4.5 3 4.5H5z"></path></svg><span class="lbl">Med</span></button></div><div class="entry"><button class="check" type="button" data-action="check" data-id="dog" aria-pressed="false" aria-label="Mark done: Feed the dog"><span class="box"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span></button><div class="body"><div class="title">Feed the dog</div></div><button class="flag" type="button" data-action="flag" data-id="dog" data-p="1" aria-label="Feed the dog: priority medium. Change priority"><svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4"></path><path d="M5 4h13l-3 4.5 3 4.5H5z"></path></svg><span class="lbl">Med</span></button></div><div class="entry"><button class="check" type="button" data-action="check" data-id="piano" aria-pressed="false" aria-label="Mark done: Practice piano"><span class="box"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span></button><div class="body"><div class="title">Practice piano</div></div><button class="flag" type="button" data-action="flag" data-id="piano" data-p="0" aria-label="Practice piano: priority none. Change priority"><svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4"></path><path d="M5 4h13l-3 4.5 3 4.5H5z"></path></svg></button></div><div class="entry"><button class="check" type="button" data-action="check" data-id="recycling" aria-pressed="false" aria-label="Mark done: Take out recycling"><span class="box"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span></button><div class="body"><div class="title">Take out recycling</div></div><button class="flag" type="button" data-action="flag" data-id="recycling" data-p="0" aria-label="Take out recycling: priority none. Change priority"><svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4"></path><path d="M5 4h13l-3 4.5 3 4.5H5z"></path></svg></button></div><div class="entry"><button class="check" type="button" data-action="check" data-id="laundry" aria-pressed="false" aria-label="Mark done: Fold laundry"><span class="box"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span></button><div class="body"><div class="title">Fold laundry</div></div><button class="flag" type="button" data-action="flag" data-id="laundry" data-p="0" aria-label="Fold laundry: priority none. Change priority"><svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4"></path><path d="M5 4h13l-3 4.5 3 4.5H5z"></path></svg></button></div><div class="entry"><button class="check" type="button" data-action="check" data-id="library" aria-pressed="false" aria-label="Mark done: Return library book"><span class="box"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span></button><div class="body"><div class="title">Return library book</div></div><button class="flag" type="button" data-action="flag" data-id="library" data-p="0" aria-label="Return library book: priority none. Change priority"><svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4"></path><path d="M5 4h13l-3 4.5 3 4.5H5z"></path></svg></button></div></section></main>
+
+  <footer class="foot">
+    <span>AEIOS · Prototype with sample records · Changes save in this browser.</span>
+    <button class="linkish" type="button" data-action="reset">Reset sample day</button>
+  </footer>
+</div>
+
+<script>
+(function () {
+  var SECTIONS = [
+    { id: 'morning', label: 'Morning' },
+    { id: 'afternoon', label: 'Afternoon' },
+    { id: 'evening', label: 'Evening' }
+  ];
+
+  var ROLES = {
+    student: {
+      caption: 'Sample day · Plans and checklists are editable',
+      ranges: { morning: '6:45–11:45 am', afternoon: '11:45 am–5:00 pm', evening: '6:15–9:45 pm' },
+      plans: [
+        { id: 'wake', sec: 'morning', title: 'Wake up & get ready', time: '6:45–7:15 am', past: true },
+        { id: 'breakfast', sec: 'morning', title: 'Breakfast', time: '7:15–7:40 am', past: true },
+        { id: 'amclass', sec: 'morning', title: 'Morning classes', time: '8:00–11:45 am', past: true },
+        { id: 'lunch', sec: 'afternoon', title: 'Lunch', time: '11:45 am–12:30 pm', past: true },
+        { id: 'pmclass', sec: 'afternoon', title: 'Afternoon classes', time: '12:30–3:00 pm', past: true },
+        { id: 'free', sec: 'afternoon', title: 'Snack & free time', time: '3:15–4:00 pm', past: true },
+        { id: 'hwblock', sec: 'afternoon', title: 'Homework block', time: '4:00–5:00 pm', past: true },
+        { id: 'dinner', sec: 'evening', title: 'Dinner', time: '6:15–6:45 pm', past: true },
+        { id: 'chapter', sec: 'evening', title: 'Read a chapter', time: '7:10–7:30 pm', past: true, nowAfter: true },
+        { id: 'ready', sec: 'evening', title: 'Get ready for tomorrow', time: '8:30–9:00 pm' },
+        { id: 'quiet', sec: 'evening', title: 'Reading & quiet time', time: '9:00–9:30 pm' },
+        { id: 'lights', sec: 'evening', title: 'Lights out', time: '9:30–9:45 pm' }
+      ],
+      groups: [
+        { id: 'g-morning', plan: 'wake', label: 'Morning checklist', items: [
+          { id: 'bed', title: 'Make bed' }, { id: 'dressed', title: 'Get dressed' },
+          { id: 'amteeth', title: 'Brush teeth' }, { id: 'packlunch', title: 'Pack lunch' }
+        ] },
+        { id: 'g-night', plan: 'ready', label: 'Nighttime checklist', items: [
+          { id: 'backpack', title: 'Pack backpack' }, { id: 'clothes', title: 'Lay out clothes' },
+          { id: 'laptop', title: 'Charge laptop' }, { id: 'water', title: 'Fill water bottle' },
+          { id: 'teeth', title: 'Brush teeth' }, { id: 'alarm', title: 'Set alarm' }
+        ] }
+      ],
+      work: [
+        { id: 'math', title: 'Math worksheet' }, { id: 'lab', title: 'Science lab write-up' },
+        { id: 'spelling', title: 'Study spelling list' }, { id: 'piano', title: 'Practice piano' },
+        { id: 'dog', title: 'Feed the dog' }, { id: 'recycling', title: 'Take out recycling' },
+        { id: 'laundry', title: 'Fold laundry' }, { id: 'library', title: 'Return library book' }
+      ],
+      pri: { math: 2, lab: 2, backpack: 2, chapter: 1, spelling: 1, laptop: 1, dog: 1 },
+      setBy: { math: 'teacher', lab: 'teacher', backpack: 'parent' },
+      done: { bed: true, dressed: true, amteeth: true, packlunch: true }
+    },
+    parent: {
+      caption: 'Sample parent day · Your plans, plus your student’s progress',
+      ranges: { morning: '6:15–11:45 am', afternoon: '12:30–5:00 pm', evening: '6:15–10:00 pm' },
+      plans: [
+        { id: 'p-wake', sec: 'morning', title: 'Wake up & coffee', time: '6:15–6:45 am', past: true },
+        { id: 'p-breakfast', sec: 'morning', title: 'Breakfast with the kids', time: '6:45–7:30 am', past: true },
+        { id: 'p-drop', sec: 'morning', title: 'School drop-off', time: '7:35–7:55 am', past: true },
+        { id: 'p-workam', sec: 'morning', title: 'Work', time: '8:30–11:45 am', past: true },
+        { id: 'p-workpm', sec: 'afternoon', title: 'Work', time: '12:30–2:45 pm', past: true },
+        { id: 'p-pickup', sec: 'afternoon', title: 'School pickup', time: '2:55–3:20 pm', past: true },
+        { id: 'p-piano', sec: 'afternoon', title: 'Drive to piano lesson', time: '4:15–5:00 pm', past: true },
+        { id: 'p-dinner', sec: 'evening', title: 'Dinner', time: '6:15–6:45 pm', past: true },
+        { id: 'p-hwcheck', sec: 'evening', title: 'Homework check-in', time: '7:00–7:30 pm', past: true, nowAfter: true },
+        { id: 'p-bedtime', sec: 'evening', title: 'Bedtime routine', time: '8:30–9:00 pm' },
+        { id: 'p-wind', sec: 'evening', title: 'Wind down', time: '9:30–10:00 pm' }
+      ],
+      groups: [
+        { id: 'g-door', plan: 'p-breakfast', label: 'Out the door', items: [
+          { id: 'p-lunches', title: 'Lunches packed' }, { id: 'p-bags', title: 'Backpacks by the door' },
+          { id: 'p-log', title: 'Sign reading log' }
+        ] },
+        { id: 'g-tomorrow', plan: 'p-bedtime', label: 'Tomorrow prep', items: [
+          { id: 'p-slip', title: 'Sign field trip permission slip' }, { id: 'p-sched', title: 'Check tomorrow’s schedule' },
+          { id: 'p-snack', title: 'Pack snack for practice' }, { id: 'p-uniform', title: 'Wash gym uniform' }
+        ] }
+      ],
+      work: [
+        { id: 'p-lunchacct', title: 'Pay school lunch account' }, { id: 'p-email', title: 'Email teacher about field trip' },
+        { id: 'p-dentist', title: 'Schedule dentist appointment' }, { id: 'p-rsvp', title: 'RSVP to birthday party' },
+        { id: 'p-poster', title: 'Buy poster board for science project' }, { id: 'p-photos', title: 'Order school photos' }
+      ],
+      pri: { 'p-slip': 2, 'p-lunchacct': 2, 'p-email': 1, 'p-poster': 1, 'p-bedtime': 1 },
+      done: { 'p-lunches': true, 'p-bags': true, 'p-log': true }
+    },
+    teacher: {
+      caption: 'Sample teacher day · Your schedule, plus tonight’s assignments',
+      ranges: { morning: '7:15–11:45 am', afternoon: '11:50 am–4:00 pm', evening: '6:15–10:00 pm' },
+      plans: [
+        { id: 't-arrive', sec: 'morning', title: 'Arrive & set up room', time: '7:15–7:45 am', past: true },
+        { id: 't-home', sec: 'morning', title: 'Homeroom', time: '7:50–8:05 am', past: true },
+        { id: 't-p1', sec: 'morning', title: 'Period 1 · Math 6', time: '8:10–9:00 am', past: true },
+        { id: 't-p2', sec: 'morning', title: 'Period 2 · Math 6', time: '9:05–9:55 am', past: true },
+        { id: 't-plan', sec: 'morning', title: 'Planning period', time: '10:00–10:50 am', past: true },
+        { id: 't-p3', sec: 'morning', title: 'Period 3 · Science 6', time: '10:55–11:45 am', past: true },
+        { id: 't-duty', sec: 'afternoon', title: 'Lunch duty', time: '11:50 am–12:20 pm', past: true },
+        { id: 't-p4', sec: 'afternoon', title: 'Period 4 · Science 6', time: '12:25–1:15 pm', past: true },
+        { id: 't-p5', sec: 'afternoon', title: 'Period 5 · Math 7', time: '1:20–2:10 pm', past: true },
+        { id: 't-p6', sec: 'afternoon', title: 'Period 6 · Math 7', time: '2:15–3:05 pm', past: true },
+        { id: 't-staff', sec: 'afternoon', title: 'Staff meeting', time: '3:15–4:00 pm', past: true },
+        { id: 't-dinner', sec: 'evening', title: 'Dinner', time: '6:15–6:45 pm', past: true },
+        { id: 't-grade', sec: 'evening', title: 'Grade quizzes', time: '7:00–7:45 pm', past: true, nowAfter: true },
+        { id: 't-prep', sec: 'evening', title: 'Plan tomorrow’s lessons', time: '8:00–8:45 pm' },
+        { id: 't-wind', sec: 'evening', title: 'Wind down', time: '9:30–10:00 pm' }
+      ],
+      groups: [
+        { id: 'g-bell', plan: 't-arrive', label: 'Before first bell', items: [
+          { id: 't-agenda', title: 'Write agenda on board' }, { id: 't-exit', title: 'Print exit tickets' },
+          { id: 't-inbox', title: 'Check messages' }
+        ] },
+        { id: 'g-before', plan: 't-prep', label: 'Before tomorrow', items: [
+          { id: 't-posthw', title: 'Post homework online' }, { id: 't-gradebook', title: 'Update gradebook' },
+          { id: 't-replies', title: 'Reply to parent emails' }, { id: 't-labprep', title: 'Prep lab materials' }
+        ] }
+      ],
+      work: [
+        { id: 't-sub', title: 'Write sub plans for Friday' }, { id: 't-forms', title: 'Collect field trip forms' },
+        { id: 't-conf', title: 'Open conference sign-ups' }, { id: 't-supplies', title: 'Order lab supplies' },
+        { id: 't-site', title: 'Update class website' }, { id: 't-books', title: 'Return classroom library books' }
+      ],
+      pri: { 't-sub': 2, 't-forms': 2, 't-gradebook': 2, 't-replies': 1, 't-supplies': 1 },
+      done: { 't-agenda': true, 't-exit': true, 't-inbox': true }
+    }
+  };
+
+  // Assignments a teacher gave tonight; they appear in the student's "To plan" list.
+  var ASSIGNED = [
+    { id: 'math', cls: 'Math 6 · due tomorrow' },
+    { id: 'lab', cls: 'Science 6 · due Friday' },
+    { id: 'spelling', cls: 'Homeroom · quiz Friday' }
+  ];
+
+  var KEY = 'aeios-day-view-v3';
+  var FLAG_WORDS = ['none', 'medium', 'high'];
+  var FLAG_LABELS = ['', 'Med', 'High'];
+
+  function fresh() {
+    var roles = {};
+    Object.keys(ROLES).forEach(function (r) {
+      roles[r] = { done: Object.assign({}, ROLES[r].done), pri: Object.assign({}, ROLES[r].pri), setBy: Object.assign({}, ROLES[r].setBy || {}) };
+    });
+    return { role: 'student', view: 'time', filter: 'all', open: { morning: false, afternoon: false, evening: true }, closedGroups: {}, parentShowAll: false, roles: roles };
+  }
+  var state = fresh();
+  try {
+    var saved = JSON.parse(localStorage.getItem(KEY) || 'null');
+    if (saved && typeof saved === 'object') {
+      var base = fresh();
+      state = Object.assign(base, saved);
+      state.open = Object.assign(base.open, saved.open || {});
+      state.closedGroups = saved.closedGroups || {};
+      state.roles = fresh().roles;
+      Object.keys(state.roles).forEach(function (r) {
+        if (saved.roles && saved.roles[r]) {
+          state.roles[r].done = saved.roles[r].done || state.roles[r].done;
+          state.roles[r].pri = saved.roles[r].pri || state.roles[r].pri;
+          state.roles[r].setBy = saved.roles[r].setBy || state.roles[r].setBy;
+        }
+      });
+      if (!ROLES[state.role] && state.role !== 'admin') state.role = 'student';
+    }
+  } catch (e) {}
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+
+  var FLAG_SVG = '<svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4"/><path d="M5 4h13l-3 4.5 3 4.5H5z"/></svg>';
+  var CHECK_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  var CLOCK_SVG = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>';
+  var CHEV_SVG = '<svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+  var LIST_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11"/><path d="M9 12h11"/><path d="M9 18h11"/><path d="M4 6h.01"/><path d="M4 12h.01"/><path d="M4 18h.01"/></svg>';
+  var PLUS_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>';
+  var LOCK_SVG = '<svg class="lock" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+  var MINUS_SVG ='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg>';
+
+  // Flatten one role's data into items: plans, checklist items, work items.
+  function itemsFor(roleId) {
+    var R = ROLES[roleId];
+    var byPlan = {};
+    R.plans.forEach(function (p) { byPlan[p.id] = p; });
+    var out = R.plans.map(function (p) {
+      return { id: p.id, kind: 'plan', title: p.title, time: p.time, sec: p.sec, past: !!p.past, nowAfter: !!p.nowAfter, meta: 'Plan · ' + p.time };
+    });
+    R.groups.forEach(function (g) {
+      var pl = byPlan[g.plan];
+      g.items.forEach(function (c) {
+        out.push({ id: c.id, kind: 'check', title: c.title, group: g.id, sec: pl.sec, meta: g.label + ' · ' + pl.time });
+      });
+    });
+    R.work.forEach(function (w) {
+      out.push({ id: w.id, kind: 'work', title: w.title, meta: 'Work & responsibilities' });
+    });
+    return out;
+  }
+  function priIn(roleId, it) { return state.roles[roleId].pri[it.id] || 0; }
+  function doneIn(roleId, it) { return it.kind !== 'plan' && !!state.roles[roleId].done[it.id]; }
+
+  function render() {
+    var role = state.role;
+    ['student', 'parent', 'teacher', 'admin'].forEach(function (r) {
+      document.getElementById('role-' + r).setAttribute('aria-pressed', String(role === r));
+    });
+    var isAdmin = role === 'admin';
+    document.getElementById('controls').hidden = isAdmin;
+    document.getElementById('band-right').hidden = isAdmin;
+
+    if (isAdmin) {
+      document.getElementById('caption').textContent = 'Admin';
+      document.getElementById('board').innerHTML = '<section class="card wide"><div class="card-head"><div><h2>The Admin view isn’t in this prototype yet</h2><p>Switch to Student, Parent or Teacher to see the consolidated day.</p></div></div></section>';
+      return;
+    }
+
+    var R = ROLES[role];
+    var items = itemsFor(role);
+    function pri(it) { return priIn(role, it); }
+    function isDone(it) { return doneIn(role, it); }
+
+    // A flag a parent or teacher set on a student task is locked on the student's list.
+    function lockedBy(it) {
+      if (role !== 'student' || it.kind === 'plan' || !pri(it)) return null;
+      return state.roles.student.setBy[it.id] || null;
+    }
+    function flagBtn(it) {
+      var p = pri(it);
+      var by = lockedBy(it);
+      if (by) {
+        return '<span class="flag locked" data-p="' + p + '" role="img" aria-label="' + it.title + ': priority ' + FLAG_WORDS[p] +
+          ', set by your ' + by + '">' + LOCK_SVG + FLAG_SVG + '<span class="lbl">' + FLAG_LABELS[p] + '</span></span>';
+      }
+      return '<button class="flag" type="button" data-action="flag" data-id="' + it.id + '" data-p="' + p + '" aria-label="' +
+        it.title + ': priority ' + FLAG_WORDS[p] + '. Change priority">' + FLAG_SVG +
+        (p ? '<span class="lbl">' + FLAG_LABELS[p] + '</span>' : '') + '</button>';
+    }
+    function checkBtn(it) {
+      var d = isDone(it);
+      return '<button class="check" type="button" data-action="check" data-id="' + it.id + '" aria-pressed="' + d +
+        '" aria-label="' + (d ? 'Mark not done: ' : 'Mark done: ') + it.title + '"><span class="box">' + CHECK_SVG + '</span></button>';
+    }
+    function entry(it, withMeta) {
+      var lead = it.kind === 'plan' ? '<div class="clock">' + CLOCK_SVG + '</div>' : checkBtn(it);
+      var by = lockedBy(it);
+      var meta = withMeta ? it.meta : '';
+      if (by) meta = (meta ? meta + ' · ' : '') + 'Priority set by your ' + by;
+      return '<div class="entry' + (isDone(it) ? ' done' : '') + '">' + lead +
+        '<div class="body"><div class="title">' + it.title + '</div>' +
+        (meta ? '<div class="meta">' + meta + '</div>' : '') + '</div>' + flagBtn(it) + '</div>';
+    }
+    function planRow(it) {
+      return '<div class="plan' + (it.past ? ' past' : '') + '"><div class="time">' + it.time + '</div><div class="title">' +
+        it.title + '</div>' + flagBtn(it) + '</div>';
+    }
+    function roFlag(p) {
+      return '<span class="flag" data-p="' + p + '">' + FLAG_SVG + (p ? '<span class="lbl">' + FLAG_LABELS[p] + '</span>' : '') + '</span>';
+    }
+
+    var f = state.filter;
+    var plans = items.filter(function (i) { return i.kind === 'plan'; });
+    var checks = items.filter(function (i) { return i.kind === 'check'; });
+    var works = items.filter(function (i) { return i.kind === 'work'; });
+    var tasks = items.filter(function (i) { return i.kind !== 'plan'; });
+    var showPlans = f === 'all' || f === 'plans';
+    var showChecks = f === 'all' || f === 'check';
+    var showWork = f === 'all' || f === 'work';
+    var html = '';
+
+    // Role summary card: parent sees the student's progress, teacher sees tonight's assignments.
+    if (role === 'parent' || role === 'teacher') {
+      var sItems = itemsFor('student');
+      var sTasks = sItems.filter(function (i) { return i.kind !== 'plan'; });
+      var sDone = sTasks.filter(function (i) { return doneIn('student', i); }).length;
+      var sHigh = sItems.filter(function (i) { return priIn('student', i) === 2 && !doneIn('student', i) && !i.past; }).length;
+      var sBy = state.roles.student.setBy;
+      // A row for one of the student's tasks, with a flag the parent or teacher can set.
+      function adultRow(it, metaText) {
+        var p = priIn('student', it);
+        var d = doneIn('student', it);
+        var by = sBy[it.id];
+        var who = !p ? '' : (by === role ? 'you' : (by ? 'the ' + by : 'your student'));
+        var meta = metaText + (who ? ' · flag set by ' + who : '');
+        return '<div class="entry ro' + (d ? ' done' : '') + '"><div class="body"><div class="title">' + it.title + '</div><div class="meta">' + meta + '</div></div>' +
+          '<span class="status' + (d ? ' ok' : '') + '">' + (d ? 'Done' : 'Not done yet') + '</span>' +
+          '<button class="flag" type="button" data-action="sflag" data-id="' + it.id + '" data-p="' + p + '" aria-label="Set your student’s priority for ' +
+          it.title + ', now ' + FLAG_WORDS[p] + '">' + FLAG_SVG + (p ? '<span class="lbl">' + FLAG_LABELS[p] + '</span>' : '') + '</button></div>';
+      }
+      if (role === 'parent') {
+        var open = sTasks.filter(function (i) { return !doneIn('student', i); })
+          .sort(function (a, b) { return priIn('student', b) - priIn('student', a); });
+        var list = state.parentShowAll ? open : open.slice(0, 6);
+        html += '<section class="card wide"><div class="card-head"><h2>Your student today</h2><p>' + sDone + ' of ' + sTasks.length +
+          ' tasks done · ' + sHigh + ' high priority left</p></div>' +
+          '<p class="how">Tap a flag to set your student’s priority. A flag you set is locked on their list until you clear it.</p>' +
+          (list.length ? list.map(function (i) { return adultRow(i, i.meta); }).join('') : '<div class="empty">Every task is done.</div>') +
+          (open.length > 6 ? '<div class="more"><button class="linkish" type="button" data-action="pshowall">' +
+            (state.parentShowAll ? 'Show fewer' : 'Show all ' + open.length + ' unfinished tasks') + '</button></div>' : '') +
+          '</section>';
+      } else {
+        var byId = {};
+        sItems.forEach(function (i) { byId[i.id] = i; });
+        html += '<section class="card wide"><div class="card-head"><h2>Assigned for tonight</h2><p>Progress from the sample student</p></div>' +
+          '<p class="how">Tap a flag to set the priority students see. Your flag is locked on their list until you clear it.</p>' +
+          ASSIGNED.map(function (a) { return adultRow(byId[a.id], a.cls); }).join('') + '</section>';
+      }
+    }
+
+    if (state.view === 'time') {
+      if (showPlans || showChecks) {
+        html += '<section class="card schedule"><div class="card-head"><h2>Schedule</h2><p>Checklists sit inside the plan they belong to</p></div>';
+        SECTIONS.forEach(function (s) {
+          var secPlans = plans.filter(function (p) { return p.sec === s.id; });
+          var secGroups = R.groups.filter(function (g) { return secPlans.some(function (p) { return p.id === g.plan; }); });
+          if (!showPlans && !secGroups.length) return;
+          var open = !!state.open[s.id];
+          var secChecks = checks.filter(function (c) { return c.sec === s.id; });
+          var sum = secPlans.length + ' plans';
+          if (secChecks.length) sum += ' · checklist ' + secChecks.filter(isDone).length + ' of ' + secChecks.length;
+          html += '<button class="sec" type="button" data-action="sec" data-sec="' + s.id + '" aria-expanded="' + open + '">' +
+            '<span class="name">' + s.label + '</span><span class="range">' + R.ranges[s.id] + '</span>' +
+            (s.id === 'evening' ? '<span class="nowtag">Now</span>' : '') +
+            '<span class="sum">' + sum + '</span>' + CHEV_SVG + '</button>';
+          if (!open) return;
+          secPlans.forEach(function (pl) {
+            if (showPlans) html += planRow(pl);
+            if (showPlans && pl.nowAfter) html += '<div class="now"><span>Now · 7:49 pm</span><i></i></div>';
+            if (!showChecks) return;
+            R.groups.filter(function (g) { return g.plan === pl.id; }).forEach(function (g) {
+              var gItems = checks.filter(function (c) { return c.group === g.id; });
+              var gOpen = !state.closedGroups[g.id];
+              html += '<button class="group" type="button" data-action="group" data-group="' + g.id + '" aria-expanded="' + gOpen + '">' + LIST_SVG +
+                '<span class="lbl">' + g.label + '</span><span class="cnt">' + gItems.filter(isDone).length + ' of ' + gItems.length + ' ready</span>' + CHEV_SVG + '</button>';
+              if (gOpen) html += '<div class="nested">' + gItems.map(function (c) { return entry(c, false); }).join('') + '</div>';
+            });
+          });
+        });
+        html += '</section>';
+      }
+      if (showWork) {
+        var sorted = works.slice().sort(function (a, b) { return pri(b) - pri(a); });
+        html += '<section class="card toplan"><div class="card-head"><div><h2>To plan · ' + works.length +
+          '</h2><p>Not on the schedule yet. Flagged items come first.</p></div></div>' +
+          sorted.map(function (w) { return entry(w, false); }).join('') + '</section>';
+      }
+    } else {
+      var shown = items.filter(function (i) {
+        return f === 'all' || (f === 'plans' ? i.kind === 'plan' : i.kind === f);
+      });
+      [
+        { p: 2, label: 'High priority', color: 'var(--high)', fill: 'currentColor' },
+        { p: 1, label: 'Medium priority', color: 'var(--med)', fill: 'var(--med-fill)' },
+        { p: 0, label: 'No flag', color: 'var(--muted)', fill: 'none' }
+      ].forEach(function (g) {
+        var list = shown.filter(function (i) { return pri(i) === g.p; });
+        html += '<section class="card col"><div class="col-head" style="color:' + g.color + '">' +
+          FLAG_SVG.replace('<svg ', '<svg style="fill:' + g.fill + '" ') +
+          '<h2>' + g.label + '</h2><span class="n">' + list.length + '</span></div>' +
+          (list.length ? list.map(function (i) { return entry(i, true); }).join('') : '<div class="empty">Nothing here with this filter.</div>') +
+          '</section>';
+      });
+    }
+    document.getElementById('board').innerHTML = html;
+    document.getElementById('caption').textContent = R.caption;
+
+    var doneN = tasks.filter(isDone).length;
+    var highN = items.filter(function (i) { return pri(i) === 2 && !isDone(i) && !i.past; }).length;
+    document.getElementById('sum-done').textContent = doneN + ' of ' + tasks.length + ' tasks done';
+    document.getElementById('sum-high').textContent = highN + ' high priority left';
+
+    var allOpen = SECTIONS.every(function (s) { return state.open[s.id]; });
+    var fd = document.getElementById('fullday');
+    fd.setAttribute('aria-pressed', String(allOpen));
+    fd.innerHTML = (allOpen ? MINUS_SVG : PLUS_SVG) + '<span>' + (allOpen ? 'Evening only' : 'Full day') + '</span>';
+
+    document.getElementById('view-time').setAttribute('aria-pressed', String(state.view === 'time'));
+    document.getElementById('view-priority').setAttribute('aria-pressed', String(state.view === 'priority'));
+
+    var chips = [
+      { id: 'all', label: 'All', n: items.length },
+      { id: 'plans', label: 'Plans', n: plans.length },
+      { id: 'check', label: 'Checklist', n: checks.length },
+      { id: 'work', label: 'Work & responsibilities', n: works.length }
+    ];
+    document.getElementById('chips').innerHTML = chips.map(function (c) {
+      return '<button class="chip" type="button" data-action="filter" data-filter="' + c.id + '" aria-pressed="' + (f === c.id) +
+        '"><span>' + c.label + '</span><b>' + c.n + '</b></button>';
+    }).join('');
+  }
+
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    var a = btn.getAttribute('data-action');
+    var id = btn.getAttribute('data-id');
+    var rs = state.roles[state.role];
+    var focusKey = null;
+    if (a === 'flag' && rs) {
+      rs.pri[id] = ((rs.pri[id] || 0) + 1) % 3;
+      focusKey = '[data-action="flag"][data-id="' + id + '"]';
+    } else if (a === 'sflag') {
+      var sr = state.roles.student;
+      var next = ((sr.pri[id] || 0) + 1) % 3;
+      sr.pri[id] = next;
+      if (next) sr.setBy[id] = state.role; else delete sr.setBy[id];
+      focusKey = '[data-action="sflag"][data-id="' + id + '"]';
+    } else if (a === 'pshowall') {
+      state.parentShowAll = !state.parentShowAll;
+      focusKey = '[data-action="pshowall"]';
+    } else if (a === 'check' && rs) {
+      rs.done[id] = !rs.done[id];
+      focusKey = '[data-action="check"][data-id="' + id + '"]';
+    } else if (a === 'sec') {
+      var sid = btn.getAttribute('data-sec');
+      state.open[sid] = !state.open[sid];
+      focusKey = '[data-action="sec"][data-sec="' + sid + '"]';
+    } else if (a === 'group') {
+      var gid = btn.getAttribute('data-group');
+      state.closedGroups[gid] = !state.closedGroups[gid];
+      focusKey = '[data-action="group"][data-group="' + gid + '"]';
+    } else if (a === 'fullday') {
+      var allOpen = SECTIONS.every(function (s) { return state.open[s.id]; });
+      state.open = allOpen ? { morning: false, afternoon: false, evening: true } : { morning: true, afternoon: true, evening: true };
+      focusKey = '#fullday';
+    } else if (a === 'view') {
+      state.view = btn.getAttribute('data-view');
+      focusKey = '#view-' + state.view;
+    } else if (a === 'filter') {
+      state.filter = btn.getAttribute('data-filter');
+      focusKey = '[data-action="filter"][data-filter="' + state.filter + '"]';
+    } else if (a === 'role') {
+      state.role = btn.getAttribute('data-role');
+      focusKey = '#role-' + state.role;
+    } else if (a === 'reset') {
+      state = fresh();
+    } else {
+      return;
+    }
+    save();
+    render();
+    if (focusKey) {
+      var el = document.querySelector(focusKey);
+      if (el) el.focus();
+    }
+  });
+
+  render();
+})();
+</script>
+
+</body></html>
