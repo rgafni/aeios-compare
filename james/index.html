@@ -247,6 +247,10 @@ span.flag.locked { gap: 4px; }
   </footer>
 </div>
 
+<script>/* AEIOS compare: James's mockup hard-codes "now" (7:49 PM) as constants: past flags, the "Now" line position, the Now tag on Evening,
+the open section and the header text. With ?t=HHMM those same constants are computed from the demo time. No features are added. */
+window.__JT=(function(){var q=new URLSearchParams(location.search).get('t');return /^\d{3,4}$/.test(q||'')?(+q.slice(0,-2))*60+(+q.slice(-2)):null;})();
+window.__JLABEL=function(T,up){var h=Math.floor(T/60),m=T%60,ap=h>=12?'pm':'am';h=h%12||12;var s=h+':'+(m<10?'0':'')+m+' '+ap;return up?s.toUpperCase():s;};</script>
 <script>
 (function () {
   var SECTIONS = [
@@ -379,12 +383,29 @@ span.flag.locked { gap: 4px; }
   var FLAG_WORDS = ['none', 'medium', 'high'];
   var FLAG_LABELS = ['', 'Med', 'High'];
 
+var NOW_SEC = 'evening', NOW_LABEL = '7:49 pm';
+  (function () {
+    var T = window.__JT; if (T == null) return;
+    function pt(s, suf) { var m = s.trim().match(/^(\d{1,2}):(\d{2})\s*(am|pm)?$/); var h = +m[1], mi = +m[2], ap = m[3] || suf; if (ap === 'pm' && h !== 12) h += 12; if (ap === 'am' && h === 12) h = 0; return h * 60 + mi; }
+    function rng(t) { var p = t.split('\u2013'); var em = p[1].trim().match(/(am|pm)$/), sm = p[0].trim().match(/(am|pm)$/); var e = pt(p[1], em && em[1]); var s = pt(p[0], sm ? sm[1] : (em && em[1])); if (!sm && s > e) s -= 720; return [s, e]; }
+    Object.keys(ROLES).forEach(function (r) {
+      var plans = ROLES[r].plans || [], last = -1;
+      plans.forEach(function (p, i) { var x = rng(p.time); p.past = x[1] <= T; p.nowAfter = false; if (p.past) last = i; });
+      if (last >= 0 && last < plans.length - 1) plans[last].nowAfter = true;
+    });
+    var rg = ROLES.student.ranges; NOW_SEC = null;
+    SECTIONS.forEach(function (s) { var x = rng(rg[s.id]); if (!NOW_SEC && T >= x[0] && T < x[1]) NOW_SEC = s.id; });
+    if (!NOW_SEC) SECTIONS.forEach(function (s) { var x = rng(rg[s.id]); if (!NOW_SEC && T < x[0]) NOW_SEC = s.id; });
+    if (!NOW_SEC) NOW_SEC = 'evening';
+    NOW_LABEL = window.__JLABEL(T, false);
+  })();
+  function OPEN0() { var o = { morning: false, afternoon: false, evening: false }; o[NOW_SEC] = true; return o; }
   function fresh() {
     var roles = {};
     Object.keys(ROLES).forEach(function (r) {
       roles[r] = { done: Object.assign({}, ROLES[r].done), pri: Object.assign({}, ROLES[r].pri), setBy: Object.assign({}, ROLES[r].setBy || {}) };
     });
-    return { role: 'student', view: 'time', filter: 'all', open: { morning: false, afternoon: false, evening: true }, closedGroups: {}, parentShowAll: false, roles: roles };
+    return { role: 'student', view: 'time', filter: 'all', open: OPEN0(), closedGroups: {}, parentShowAll: false, roles: roles };
   }
   var state = fresh();
   try {
@@ -405,6 +426,7 @@ span.flag.locked { gap: 4px; }
       if (!ROLES[state.role] && state.role !== 'admin') state.role = 'student';
     }
   } catch (e) {}
+  if (window.__JT != null) state.open = OPEN0();
   function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
 
   var FLAG_SVG = '<svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4"/><path d="M5 4h13l-3 4.5 3 4.5H5z"/></svg>';
@@ -558,12 +580,12 @@ span.flag.locked { gap: 4px; }
           if (secChecks.length) sum += ' · checklist ' + secChecks.filter(isDone).length + ' of ' + secChecks.length;
           html += '<button class="sec" type="button" data-action="sec" data-sec="' + s.id + '" aria-expanded="' + open + '">' +
             '<span class="name">' + s.label + '</span><span class="range">' + R.ranges[s.id] + '</span>' +
-            (s.id === 'evening' ? '<span class="nowtag">Now</span>' : '') +
+            (s.id === NOW_SEC ? '<span class="nowtag">Now</span>' : '') +
             '<span class="sum">' + sum + '</span>' + CHEV_SVG + '</button>';
           if (!open) return;
           secPlans.forEach(function (pl) {
             if (showPlans) html += planRow(pl);
-            if (showPlans && pl.nowAfter) html += '<div class="now"><span>Now · 7:49 pm</span><i></i></div>';
+            if (showPlans && pl.nowAfter) html += '<div class="now"><span>Now · ' + NOW_LABEL + '</span><i></i></div>';
             if (!showChecks) return;
             R.groups.filter(function (g) { return g.plan === pl.id; }).forEach(function (g) {
               var gItems = checks.filter(function (c) { return c.group === g.id; });
@@ -659,7 +681,7 @@ span.flag.locked { gap: 4px; }
       focusKey = '[data-action="group"][data-group="' + gid + '"]';
     } else if (a === 'fullday') {
       var allOpen = SECTIONS.every(function (s) { return state.open[s.id]; });
-      state.open = allOpen ? { morning: false, afternoon: false, evening: true } : { morning: true, afternoon: true, evening: true };
+      state.open = allOpen ? OPEN0() : { morning: true, afternoon: true, evening: true };
       focusKey = '#fullday';
     } else if (a === 'view') {
       state.view = btn.getAttribute('data-view');
@@ -685,6 +707,8 @@ span.flag.locked { gap: 4px; }
 
   render();
 })();
-</script>
+</script><script>(function(){var T=window.__JT;if(T==null)return;var b=document.querySelector('.band');if(!b)return;
+var secs=[['Morning',405,705],['Afternoon',705,1020],['Evening',1095,1305]];var part='Evening';for(var i=0;i<secs.length;i++){if(T>=secs[i][1]&&T<secs[i][2]){part=secs[i][0];break;}if(T<secs[i][1]){part=secs[i][0];break;}}
+b.querySelector('.eyebrow').textContent='RIGHT NOW · '+window.__JLABEL(T,true);b.querySelector('.part').textContent=part;b.querySelector('.datenav span').textContent='Thursday, October 8';})();</script>
 
 </body></html>

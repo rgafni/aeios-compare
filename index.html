@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#182b4b">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400..800&display=swap" rel="stylesheet">
 <title>AEIOS Today · compare 3 versions</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -18,9 +19,22 @@ body{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidd
 .stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:none;background:#f2f3f7}
 .stage iframe.on{display:block}
 .note{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);font-size:16px;color:#59606a}
+.top{flex:none;background:linear-gradient(115deg,#182b4b,#243e63);color:#fff;padding:0 calc(10px + env(safe-area-inset-right)) 8px calc(10px + env(safe-area-inset-left))}
+.top .bar{padding-left:0;padding-right:0;background:none}
+.times{display:flex;gap:4px;background:rgba(255,255,255,.10);border-radius:14px;padding:4px;max-width:616px;margin:0 auto}
+.times button{flex:1;min-height:52px;border:0;border-radius:11px;background:none;color:#dfe9f3;font:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:4px 2px;line-height:1.15}
+.times b{font-size:15px;font-weight:750}
+.times span{font-size:14px;font-weight:600;color:#b7c8dc}
+.times button[aria-checked=true]{background:#e9f0f9;color:#182b4b;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.times button[aria-checked=true] span{color:#3a5276}
+.times button:focus-visible,.tabs button:focus-visible,.open:focus-visible{outline:3px solid #9cc3ff;outline-offset:2px}
+.info{max-width:616px;margin:7px auto 0;font-size:14px;line-height:1.35;color:#cfdcea;text-align:center;min-height:19px}
+.info b{color:#fff;font-weight:700}
+@media (max-width:420px){.times{gap:3px;padding:3px}.times button{flex:1 1 auto;padding:4px 5px}.times b{font-size:14px;white-space:nowrap;letter-spacing:-.1px}}
 </style>
 </head>
 <body>
+<div class="top">
 <div class="bar">
   <div class="tabs" role="tablist" aria-label="Version">
     <button role="tab" id="t-mine" data-tab="mine" aria-selected="false">Mine</button>
@@ -29,22 +43,52 @@ body{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidd
   </div>
   <a class="open" id="open" href="new/" target="_blank" rel="noopener" aria-label="Open this version in a new tab"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></a>
 </div>
+  <div class="times" role="radiogroup" aria-label="Demo time, Thursday October 8">
+    <button role="radio" data-time="before" aria-checked="false"><b>Before school</b><span>7:15 AM</span></button>
+    <button role="radio" data-time="school" aria-checked="false"><b>In school</b><span>10:30 AM</span></button>
+    <button role="radio" data-time="after" aria-checked="false"><b>After school</b><span>3:45 PM</span></button>
+    <button role="radio" data-time="night" aria-checked="false"><b>Night</b><span>8:45 PM</span></button>
+  </div>
+  <p class="info" id="info" aria-live="polite"></p>
+</div>
 <div class="stage" id="stage"><div class="note">Loading…</div></div>
 <script>
 (function(){
-var SRC={mine:'https://aeios2027.netlify.app/',james:'james/',new:'new/'};
-var TITLE={mine:'Mine: live student Today page',james:'James: Day View mockup',new:'New: compromise'};
-var frames={};
-function show(tab){
-  if(!SRC[tab])tab='new';
-  if(!frames[tab]){var f=document.createElement('iframe');f.src=SRC[tab];f.title=TITLE[tab];f.setAttribute('allow','clipboard-write');document.getElementById('stage').appendChild(f);frames[tab]=f;}
-  for(var k in frames)frames[k].classList.toggle('on',k===tab);
-  [].forEach.call(document.querySelectorAll('.tabs button'),function(b){b.setAttribute('aria-selected',b.dataset.tab===tab);});
-  document.getElementById('open').href=SRC[tab];
-  if(location.hash!=='#'+tab)history.replaceState(null,'','#'+tab);
+var SRC={mine:'mine/',james:'james/',new:'new/'};
+var TITLE={mine:'Mine: copy of the live student Today page',james:'James: Day View mockup',new:'New: compromise'};
+var TIMES={before:['0715','7:15 AM'],school:['1030','10:30 AM'],after:['1545','3:45 PM'],night:['2045','8:45 PM']};
+var INFO={
+ mine:function(l){return 'Copy of the live site, clock set to <b>Thu Oct 8, '+l+'</b>';},
+ james:function(l){return 'No clock in his mockup \u00b7 markers moved to <b>'+l+'</b>';},
+ new:function(l){return 'New version at <b>Thu Oct 8, '+l+'</b>';}};
+var frames={},tab='new',time='after';
+try{time=localStorage.getItem('aeios-compare-time')||time;}catch(e){}
+function url(t){return SRC[t]+'?t='+TIMES[time][0];}
+function sync(){
+  for(var k in frames){var u=url(k);if(frames[k].getAttribute('src')!==u)frames[k].setAttribute('src',u);}
+  [].forEach.call(document.querySelectorAll('.times button'),function(b){var on=b.dataset.time===time;b.setAttribute('aria-checked',on);b.tabIndex=on?0:-1;});
+  document.getElementById('open').href=url(tab);
+  document.getElementById('info').innerHTML=INFO[tab](TIMES[time][1]);
+  var hsh='#'+tab+'/'+time;if(location.hash!==hsh)history.replaceState(null,'',hsh);
 }
+function show(t){
+  if(!SRC[t])t='new';tab=t;
+  if(!frames[t]){var f=document.createElement('iframe');f.title=TITLE[t];f.setAttribute('allow','clipboard-write');document.getElementById('stage').appendChild(f);frames[t]=f;}
+  for(var k in frames)frames[k].classList.toggle('on',k===t);
+  [].forEach.call(document.querySelectorAll('.tabs button'),function(b){b.setAttribute('aria-selected',b.dataset.tab===t);});
+  sync();
+}
+function setTime(t){if(!TIMES[t])return;time=t;try{localStorage.setItem('aeios-compare-time',t);}catch(e){}sync();}
 document.querySelector('.tabs').addEventListener('click',function(e){var b=e.target.closest('button');if(b)show(b.dataset.tab);});
-show((location.hash||'#new').slice(1));
+var tg=document.querySelector('.times');
+tg.addEventListener('click',function(e){var b=e.target.closest('button');if(b)setTime(b.dataset.time);});
+tg.addEventListener('keydown',function(e){var ks=Object.keys(TIMES),i=ks.indexOf(time);
+  if(e.key==='ArrowRight'||e.key==='ArrowDown')i=(i+1)%4;else if(e.key==='ArrowLeft'||e.key==='ArrowUp')i=(i+3)%4;else return;
+  e.preventDefault();setTime(ks[i]);tg.querySelector('[data-time='+ks[i]+']').focus();});
+var m=(location.hash||'').slice(1).split('/');
+if(TIMES[m[1]])time=m[1];
+if(!TIMES[time])time='after';
+show(m[0]||'new');
 })();
 </script>
 </body>
