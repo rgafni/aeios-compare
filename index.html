@@ -100,7 +100,8 @@ var TABS=[
  {id:'a',label:'A \u00b7 Calm',src:'new/',kind:'msg',info:'',title:'A: Calm'},
  {id:'b',label:'B \u00b7 Focus',src:'variants/b-focus/index.html',kind:'msg',info:'Concept',title:'B: Focus',optional:1},
  {id:'c',label:'C \u00b7 Timeline',src:'variants/c-timeline/index.html',kind:'msg',info:'Concept',title:'C: Timeline',optional:1},
- {id:'d',label:'D \u00b7 Chat',src:'variants/d-chat/index.html',kind:'msg',info:'Concept',title:'D: Chat',optional:1}];
+ {id:'d',label:'D \u00b7 Chat',src:'variants/d-chat/index.html',kind:'msg',info:'Concept',title:'D: Chat',optional:1},
+ {id:'bubbles',label:'E \u00b7 Bubbles',src:'variants/e-bubbles/index.html',kind:'msg',info:'Concept',title:'E: Bubbles'}];
 var byId={};TABS.forEach(function(t){byId[t.id]=t;});
 var $=function(i){return document.getElementById(i);};
 var frames={},tab='a',T=945,sel='homework';
@@ -114,7 +115,7 @@ function mOf(x){return x.id==='now'?nowMin():x.m;}
 function url(t){var d=byId[t];return d.kind==='reload'?d.src+'?t='+compact(T):(t==='a'?d.src+'?t='+compact(T):d.src+'#t='+hhmm(T));}
 /* tabs */
 TABS.forEach(function(t){var b=document.createElement('button');b.setAttribute('role','tab');b.id='t-'+t.id;b.dataset.tab=t.id;b.textContent=t.label;if(t.optional)b.hidden=true;$('tabs').appendChild(b);
- if(t.optional)fetch(t.src,{method:'HEAD',cache:'no-store'}).then(function(r){if(r.ok){b.hidden=false;if(t.id===tab)b.scrollIntoView({block:'nearest',inline:'center'});}}).catch(function(){});});
+ if(t.optional)fetch(t.src,{method:'HEAD',cache:'no-store'}).then(function(r){if(r.ok){b.hidden=false;var c=$('t-'+tab);if(c&&c.scrollIntoView)c.scrollIntoView({block:'nearest',inline:'center'});}}).catch(function(){});});
 /* time chips (radiogroup, roving tabindex) */
 var chipsEl=$('chips');
 MOMENTS.forEach(function(x){var b=document.createElement('button');b.type='button';b.className='chip'+(x.id==='now'?' chip--now':'');b.id='c-'+x.id;b.dataset.id=x.id;
