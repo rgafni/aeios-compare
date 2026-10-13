@@ -493,7 +493,7 @@ function journalSheet(){openSheet=['journal'];var b='<p>One thing worth remember
 function goalSheet(){openSheet=['goal'];var d='';for(var i=0;i<GOAL.target;i++)d+='<i class="'+(i<GOAL.done?'on':'')+'" style="width:22px;height:22px;border-radius:50%;display:inline-block;margin-right:6px;background:'+(i<GOAL.done?'#e0a526':'var(--surf2)')+'"></i>';
  sheet('My goal','<p style="font-size:18px;font-weight:750">'+esc(GOAL.title)+'</p><div style="margin-top:12px" role="img" aria-label="'+GOAL.done+' of '+GOAL.target+' school days">'+d+'</div><div class="sh-meta">'+GOAL.done+' of '+GOAL.target+' school days</div><div class="sec">Next step</div><p>'+esc(GOAL.first)+'</p><div class="sec">Reward</div><p>'+esc(GOAL.reward)+' (with '+GOAL.helper+')</p>');}
 function menuSheet(){openSheet=['menu'];sheet('Maya R.','<div class="navgrid"><button data-act="ph" data-p="My calendar">My calendar</button><button data-act="ph" data-p="Classes & work">Classes &amp; work</button><button data-act="ph" data-p="My grades">My grades</button><button data-act="ph" data-p="Inbox">Inbox</button><button data-act="goal">My goals</button><button data-act="journal">Journal</button><button data-act="ph" data-p="My rewards">My rewards</button><button data-act="ph" data-p="My labs">My labs</button></div><div class="btns"><button class="btn gh" data-act="reset">Reset demo</button></div>','Grade 8 \u00b7 Section 8-1');}
-function phSheet(n){openSheet=['ph'];sheet(esc(n),'<p>This demo only builds the Today page. In the full app this opens '+esc(n)+'.</p><div class="btns"><button class="btn gh" data-act="close">Back to today</button></div>');}
+function phSheet(n){if(window.AEIOSDrawer){try{close();}catch(e){}if(window.AEIOSDrawer.route(n))return;}openSheet=['ph'];sheet(esc(n),'<p>This demo only builds the Today page. In the full app this opens '+esc(n)+'.</p><div class="btns"><button class="btn gh" data-act="close">Back to today</button></div>');}
 function refreshSheet(){if(!openSheet||!document.body.classList.contains('open'))return;var o=openSheet;if(o[0]==='task')taskSheet(o[1]);else if(o[0]==='block')blockSheet(o[1]);}
 
 /* ===== toast with undo ===== */
@@ -547,5 +547,6 @@ if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){lay
 var v0=hashT();T0=v0!=null?v0:945;T=Tf=T0;render(true);
 })();
 </script>
+<script src="../../shared/drawer.js"></script>
 </body>
 </html>

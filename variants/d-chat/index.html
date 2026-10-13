@@ -58,7 +58,13 @@ body.night .top{box-shadow:0 1px 0 var(--line)}
 
 /* feed */
 .feed{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:8px 14px 18px;scroll-behavior:auto}
-.feed-in{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:10px;min-height:100%;justify-content:flex-end}
+.feed-in{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:10px;min-height:100%;justify-content:flex-start}
+.upn{margin-top:6px;background:#fff;border-radius:18px;padding:12px 14px;box-shadow:0 1px 3px rgba(20,30,60,.1)}
+.upn h4{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.upn .ur{display:flex;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--line,#e5e8f0);font-size:15px}.upn .ur:first-of-type{border-top:0}
+.upn .ur b{width:52px;font-variant-numeric:tabular-nums}.upn .ur span{flex:1}
+.qk{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:4px}
+.qk button{min-height:48px;border-radius:14px;background:#fff;box-shadow:0 1px 3px rgba(20,30,60,.1);font-weight:750;font-size:15px;text-align:left;padding:0 12px}
 .day{align-self:center;font-size:14px;font-weight:700;color:var(--muted);padding:10px 0 2px}
 .sys{align-self:center;text-align:center;font-size:14px;color:var(--muted);max-width:300px;padding:2px 8px}
 
@@ -240,7 +246,7 @@ body.open .scrim,body.open .sheet{display:block}
 }
 </style>
 </head>
-<body>
+<body class="adw-notab">
 <div class="app" id="app">
  <nav class="rail" aria-label="Main">
   <div class="brand"><img src="assets/crest.jpg" alt=""><div><b>AEIOS</b><small>Student</small></div></div>
@@ -320,6 +326,13 @@ function curItem(){for(var i=0;i<DAY.length;i++)if(DAY[i].s<=T&&T<DAY[i].e)retur
 function nextItem(){for(var i=0;i<DAY.length;i++)if(DAY[i].s>T)return DAY[i];return null;}
 function prevItem(){var p=null;DAY.forEach(function(d){if(d.e<=T)p=d;});return p;}
 function itemDone(d){if(!d||!d.msg)return false;var r=S.r[d.msg]||S.r[d.msg+'@later'];if(d.msg==='night')return cnt('night')===6;return !!(r&&(r.a==='done'));}
+function upNext(){var up=DAY.filter(function(d){return d.s>T;}).slice(0,3),h='';
+ if(up.length){h+='<div class="upn"><h4>Coming up</h4>';up.forEach(function(d){h+='<div class="ur"><b>'+clock(d.s).replace(/ [AP]M/,'')+'</b><span>'+esc(d.n)+'</span></div>';});h+='<button class="chip" style="margin-top:6px" data-act="day">Whole day plan</button></div>';}
+ return h;}
+function upTop(){var h='';
+ var o=openReq();if(o.length){h+='<div class="upn"><h4>To-dos \u00b7 '+o.length+' open</h4>'+taskRows(o)+'</div>';}
+ h+='<div class="upn"><h4>Also here</h4><div class="qk"><button data-act="dw" data-k="lists">\u2611 Checklists</button><button data-act="dw" data-k="teaser">\ud83e\udde9 Brain teaser</button><button data-act="dw" data-k="chess">\u265e Chess</button><button data-act="dw" data-k="courses">\ud83c\udf93 Crash courses</button><button data-act="dw" data-k="msg">\u2709 Messages</button><button data-act="dw" data-k="journal">\u270e Journal</button></div></div>';
+ return h;}
 function joinNames(a){return a.length<2?a.join(''):a.slice(0,-1).join(', ')+' and '+a[a.length-1];}
 
 /* ---------- messages (the day as a thread) ---------- */
@@ -477,7 +490,7 @@ function noteHTML(e){var n=e.note;return '<div class="me mynote'+(n.done?' done'
 
 function renderFeed(stick){
  var feed=$('feed'),atBottom=feed.scrollHeight-feed.scrollTop-feed.clientHeight<120,prevTop=feed.scrollTop;
- var E=entries(),h='<div class="day">Thursday, October 8</div>',seen=UI.seen||{},nowSeen={},firstRender=!UI.seen;
+ var E=entries(),h=(T<1305?upTop():'')+'<div class="day">Thursday, October 8</div>',seen=UI.seen||{},nowSeen={},firstRender=!UI.seen;
  if(!E.length)h+='<div class="sys">Nothing yet. Messages show up here as the day goes. First one at 6:45.</div>';
  var group=[],late=[];
  function flushGroup(){if(!group.length)return;
@@ -495,7 +508,7 @@ function renderFeed(stick){
  flushGroup();
  late.forEach(function(e){h+=noteHTML(e);});
  if(T>=1305){h+='<div class="night-card"><div class="big">Lights out. Thread paused.</div><p class="sub" style="margin-top:6px">Nothing will show up here until 6:45 AM.</p><div class="rec">'+recap()+'</div>'+(soonOpen().length?'<p class="sub" style="margin-top:12px">Due Friday: '+esc(joinNames(soonOpen().map(function(t){return t.short;})))+'. It\u2019ll be here in the morning.</p>':'')+'</div>';}
- else{var n=nextItem();if(n)h+='<div class="next"><i></i>Next \u00b7 '+clock(n.s)+' \u00b7 '+esc(n.n)+'</div>';}
+ else{var n=nextItem();if(n)h+='<div class="next"><i></i>Next \u00b7 '+clock(n.s)+' \u00b7 '+esc(n.n)+'</div>';h+=upNext();}
  $('feedin').innerHTML=h;UI.seen=nowSeen;
  if(stick||atBottom)feed.scrollTop=feed.scrollHeight;else feed.scrollTop=prevTop;
  jumpBtn();
@@ -553,7 +566,7 @@ function reply(mid,a,label){var m=findMsg(mid);
  var r={a:a,label:label,at:T};
  if(a==='later'){var to=m.later||T+30;if(to<=T)to=T+30;r.to=to;}
  S.r[mid]=r;UI.open[mid]=false;UI.show[mid]=false;save();render();
- var txt=a==='later'?'Moved to '+clock(r.to):a==='skip'?'Skipped for today':label;
+ var nx=nextItem(),txt=a==='later'?'Moved to '+clock(r.to):a==='skip'?'Skipped for today':label+(a==='done'&&nx?' \u00b7 next: '+nx.n+' at '+clock(nx.s):'');
  toast(txt,function(){delete S.r[mid];if(prevChecks)S.checks[m.list]=prevChecks;if(prevDone)S.done=prevDone;save();render();});}
 function undoReply(mid){var r=S.r[mid];if(!r)return;var m=findMsg(mid);delete S.r[mid];delete S.r[mid+'@later'];save();render();}
 function setTaskDone(id,on){S.done[id]=on;if(!on)delete S.done[id];save();render();
@@ -576,9 +589,10 @@ document.addEventListener('click',function(e){
  if(a==='jsave'){var j=($('jt').value||'').trim();if(!j){toast('Write a few words first.');return;}S.journal.push({x:j,t:T});save();renderFeed();toast('Saved to your journal',function(){S.journal.pop();save();renderFeed();});return;}
  if(a==='note'){var n=S.notes[+b.dataset.i];n.done=!n.done;save();renderFeed();return;}
  if(a==='day'){daySheet();return;}
- if(a==='menu'){menuSheet();return;}
+ if(a==='menu'){if(window.AEIOSDrawer){window.AEIOSDrawer.open();}else menuSheet();return;}
+ if(a==='dw'){if(window.AEIOSDrawer)window.AEIOSDrawer.open(b.dataset.k);return;}
  if(a==='goal'){goalSheet();return;}
- if(a==='page'){closeSheet();toast(b.dataset.page+' isn\u2019t part of this demo.');return;}
+ if(a==='page'){closeSheet();var PG={'My calendar':'cal','Classes & work':'courses','My grades':'grades','Inbox':'msg','My goals':'goals','Gratitude journal':'journal'};if(window.AEIOSDrawer)window.AEIOSDrawer.open(PG[b.dataset.page]);return;}
  if(a==='jump'){var f=$('feed');f.scrollTo({top:f.scrollHeight,behavior:rm()?'auto':'smooth'});return;}
  if(a==='close'){closeSheet();return;}
  if(a==='reset'){S=fresh();save();closeSheet();UI.open={};UI.show={};render(true);toast('Demo reset');return;}
@@ -594,5 +608,6 @@ render(true);
 window.__dchat={get T(){return T;},setTime:setTime};
 })();
 </script>
+<script src="../../shared/drawer.js"></script>
 </body>
 </html>

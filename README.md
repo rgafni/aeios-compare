@@ -8,4 +8,6 @@ The **Preview time** bar at the top sets the demo time with one tap: Now, Mornin
 
 All content is the showcase's sample data. No real student data.
 
-**E · Bubbles** (`variants/e-bubbles/`): every action is a labeled bubble, sized by what matters at the demo time. Tap one and it grows into a full page (one circle scaled with a CSS transform, FLIP for the title), the rest drift aside; Back (or Esc / Android back) shrinks it home. No popups, no external fonts or scripts, honors reduced motion.
+**Shared menu** (`shared/drawer.js` + `drawer.css`): the same left drawer in A–E (edge tab, or each variant's own menu button): checklists, calendar, messages, crash courses, brain teaser, playable chess, grades, clubs, goals, journal, settings. All screens work; state saves on this device.
+
+**E · Bubbles** (`variants/e-bubbles/`): five big top-level bubbles (My day, Now, Calendar, Messages, Everything else). My day opens into sub-bubbles (Homework, Schedule, Checklist, What's due, Responsibilities) with an "All" back button; Everything else opens the shared drawer. Tap one and it grows into a full page (one circle scaled with a CSS transform, FLIP for the title), the rest drift aside; Back (or Esc / Android back) shrinks it home. No popups, no external fonts or scripts, honors reduced motion.

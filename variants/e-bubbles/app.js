@@ -27,7 +27,7 @@ var WEEK=[['Thu',8,['Classes 8:15\u20132:30','Piano 4:00']],['Fri',9,['Argument 
 var STARTERS=['Can I get help with\u2026','I was absent. What did I miss?','Can I have a bit more time on\u2026','Thanks for the feedback!'];
 
 /* ---------- icons ---------- */
-var ICON={hw:'M4 19.5V5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2Zm0 0A2 2 0 0 0 6 21h12M9 8h6M9 12h4',due:'M9 11l3 3 8-8M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9',day:'M12 7v5l3 2M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0',bag:'M5 8h14l-1 12H6L5 8Zm4 0V6a3 3 0 0 1 6 0v2',cal:'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4',grades:'M4 20V10M10 20V4M16 20v-7M21 20H3',msg:'M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12Z',clubs:'M16 20v-1a4 4 0 0 0-8 0v1M12 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM21 20v-1a3 3 0 0 0-3-3M18 5a3 3 0 0 1 0 6M3 20v-1a3 3 0 0 1 3-3M6 5a3 3 0 0 0 0 6',goal:'M5 21V4h13l-3 4.5L18 13H5',teaser:'M4 4h6a3 3 0 1 1 4 0h6v6a3 3 0 1 0 0 4v6h-6a3 3 0 1 1-4 0H4v-6a3 3 0 1 0 0-4V4Z',journal:'M12 20h9M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4Z',check:'M5 12.5l4.5 4.5L19 7.5',play:'M8 5.5v13l11-6.5z',pause:'M8 5v14M16 5v14',back:'M15 6l-6 6 6 6'};
+var ICON={hw:'M4 19.5V5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2Zm0 0A2 2 0 0 0 6 21h12M9 8h6M9 12h4',due:'M9 11l3 3 8-8M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9',day:'M12 7v5l3 2M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0',bag:'M5 8h14l-1 12H6L5 8Zm4 0V6a3 3 0 0 1 6 0v2',cal:'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4',grades:'M4 20V10M10 20V4M16 20v-7M21 20H3',msg:'M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12Z',clubs:'M16 20v-1a4 4 0 0 0-8 0v1M12 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM21 20v-1a3 3 0 0 0-3-3M18 5a3 3 0 0 1 0 6M3 20v-1a3 3 0 0 1 3-3M6 5a3 3 0 0 0 0 6',goal:'M5 21V4h13l-3 4.5L18 13H5',teaser:'M4 4h6a3 3 0 1 1 4 0h6v6a3 3 0 1 0 0 4v6h-6a3 3 0 1 1-4 0H4v-6a3 3 0 1 0 0-4V4Z',journal:'M12 20h9M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4Z',check:'M5 12.5l4.5 4.5L19 7.5',play:'M8 5.5v13l11-6.5z',pause:'M8 5v14M16 5v14',back:'M15 6l-6 6 6 6',now:'M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z',sched:'M12 7v5l3 2M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0',more:'M4 7h16M4 12h16M4 17h10',chores:'M3 11l9-7 9 7v9H3zM9 20v-6h6v6'};
 function ic(n,s,w){return '<svg width="'+(s||22)+'" height="'+(s||22)+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="'+(w||2.2)+'" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+ICON[n]+'"/></svg>';}
 function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function hm(m){m=((m%1440)+1440)%1440;var h=Math.floor(m/60)%12||12,mm=m%60;return h+':'+(mm<10?'0':'')+mm;}
@@ -42,7 +42,7 @@ var T=initialT();
 
 /* ---------- state (this device only) ---------- */
 var KEY='aeios-e-bubbles-v1';
-function fresh(){return {done:{},steps:{},checks:{school:{0:true,2:true},night:{}},teaser:{solved:false,hints:0},journal:[],clubs:{bball:true},read:false,sent:[],cur:null};}
+function fresh(){return {done:{},steps:{},checks:{school:{0:true,2:true},night:{}},teaser:{solved:false,hints:0},journal:[],clubs:{bball:true},read:false,sent:[],cur:null,chores:{}};}
 var S;try{S=JSON.parse(localStorage.getItem(KEY))||fresh();}catch(e){S=fresh();}
 (function(){var f=fresh();for(var k in f)if(S[k]==null)S[k]=f[k];})();
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
@@ -60,7 +60,12 @@ function nextBlock(t){for(var i=0;i<B.length;i++)if(B[i][0]>t)return B[i];return
 /* phase -> theme + which bubble matters most */
 function phase(t){if(t<WAKE)return 'early';if(t<495)return 'before';if(t>=685&&t<730)return 'lunch';if(t<870)return 'school';if(t<930)return 'home';if(t<1095)return 'after';if(t<1230)return 'evening';if(t<1290)return 'night';return 'bed';}
 var THEME={early:'night',before:'before',school:'school',lunch:'school',home:'after',after:'after',evening:'after',night:'night',bed:'night'};
-var ORDER=['hw','due','day','bag','cal','msg','grades','clubs','goal','teaser','journal'];
+var ALL=['now','day','cal','msg','more','hw','due','sched','bag','chores'];
+var LEVELS={top:['now','day','cal','msg','more'],day:['hw','sched','bag','due','chores']};
+var LEVEL='top';var ORDER=LEVELS.top;
+var CHORES=[['Feed the dog','Morning & 6:00 PM'],['Empty the dishwasher','After school'],['Take out recycling','Thursday night'],['Practice piano 20 min','Before dinner']];
+function chDone(){var n=0;for(var k in S.chores)if(S.chores[k])n++;return n;}
+function nowTarget(){var p=phase(T);if((p==='home'||p==='after'||p==='evening')&&requiredOpen().length&&T>=930)return 'hw';if((p==='before'||p==='night'||p==='early')&&cnt(listKey())<6)return 'bag';return 'sched';}
 var TIERS={
  early:  {day:0,bag:1,due:2,goal:2,cal:3,hw:3,msg:3,grades:3,clubs:3,teaser:3,journal:3},
  before: {bag:0,day:1,due:1,cal:2,goal:2,msg:3,hw:3,grades:3,clubs:3,teaser:3,journal:3},
@@ -72,31 +77,36 @@ var TIERS={
  night:  {bag:0,day:1,journal:1,goal:2,due:2,cal:3,hw:3,msg:3,grades:3,clubs:3,teaser:3},
  bed:    {day:0,journal:1,bag:2,goal:2,due:3,cal:3,hw:3,msg:3,grades:3,clubs:3,teaser:3}
 };
-function tiers(){var p=phase(T),t={};for(var k in TIERS[p])t[k]=TIERS[p][k];
+function tiers(){if(LEVEL==='top'){var nt=nowTarget();return {now:0,day:0,cal:1,msg:1,more:2};}
+ var p=phase(T),t={};for(var k in TIERS[p])t[k]=TIERS[p][k];
  function hero(id,old){t[old]=2;t[id]=0;}
  if((p==='home'||p==='after'||p==='evening')&&!requiredOpen().length)hero(p==='evening'||S.teaser.solved?'journal':'teaser','hw');
  if(t.bag===0&&cnt(listKey())===6)hero('day','bag');
  if(p==='night'&&cnt('night')<6)t.bag=0;
- return t;}
+ var o={hw:t.hw,due:t.due,sched:t.day,bag:t.bag,chores:2};var mn=9;for(var q in o)mn=Math.min(mn,o[q]);for(q in o)o[q]=Math.max(0,o[q]-mn);return o;}
 
 /* ---------- bubble text (short, action-style) ---------- */
 function bubbleText(id){var p=phase(T),c,n;
  switch(id){
- case 'hw':c=curTask();
+ case 'hw':c=curTask();if(LEVEL==='day'||1){}
   if(F&&F.run)return ['Start homework',mmss(F.left)+' left'];
   if(!c)return ['Start homework','All done \u2713'];
   if(T<870)return ['Start homework','After school'];
   if(T<930)return ['Start homework','Starts at 3:30'];
-  return ['Start homework',c.short];
+  return ['Homework',c.short];
  case 'due':n=dueTomorrow().length;return ['What\u2019s due',n?n+' due tomorrow':'Nothing tomorrow \u2713'];
- case 'day':var b=blockAt(T),nx=nextBlock(T);
-  if(p==='night'||p==='bed')return ['Check tomorrow','Up at '+hm(WAKE)];
-  if(T<WAKE)return ['Check your day','Alarm at '+hm(WAKE)];
-  if(b)return ['Check your day',(SHORT[b[2]]||b[2])+' till '+hm(b[1])];
-  return ['Check your day',nx?'Free till '+hm(nx[0]):'Free time'];
- case 'bag':var l=listKey();n=cnt(l);return [LISTS[l].label,n===6?'All packed \u2713':n+' of 6 packed'];
- case 'cal':return ['Check your calendar','This week'];
- case 'msg':return ['Message a teacher',S.read?'Write a note':'3 new'];
+ case 'now':var nt=nowTarget(),y=bubbleText(nt);return ['Now: '+(nt==='hw'?'Homework':nt==='bag'?'Pack up':(blockAt(T)?(SHORT[blockAt(T)[2]]||blockAt(T)[2]):'Free time')),nt==='sched'?y[1]:y[1]];
+ case 'day':var lft=requiredOpen().length;return ['My day',(lft?lft+' to-dos':'To-dos done \u2713')+' \u00b7 '+cnt(listKey())+'/6 packed'];
+ case 'more':return ['Everything else','Courses, chess, grades\u2026'];
+ case 'chores':return ['Responsibilities',chDone()+' of '+CHORES.length+' done'];
+ case 'sched':var b=blockAt(T),nx=nextBlock(T);
+  if(p==='night'||p==='bed')return ['Tomorrow','Up at '+hm(WAKE)];
+  if(T<WAKE)return ['Schedule','Alarm at '+hm(WAKE)];
+  if(b)return ['Schedule',(SHORT[b[2]]||b[2])+' till '+hm(b[1])];
+  return ['Schedule',nx?'Free till '+hm(nx[0]):'Free time'];
+ case 'bag':var l=listKey();n=cnt(l);return ['Checklist',n===6?'All packed \u2713':n+' of 6 packed'];
+ case 'cal':return ['Calendar','This week \u00b7 '+dueTomorrow().length+' due Fri'];
+ case 'msg':return ['Messages',S.read?'Write to a teacher':'3 new from teachers'];
  case 'grades':return ['Grades','1 new'];
  case 'clubs':n=0;for(var k in S.clubs)if(S.clubs[k])n++;return ['Clubs',n?n+' joined':'Find one'];
  case 'goal':return ['My goal',goalDone()+' of 7 days'];
@@ -106,17 +116,17 @@ function bubbleText(id){var p=phase(T),c,n;
 
 /* ---------- build bubbles ---------- */
 var field=$('field'),EL={},GEO={},FLT=['','f2','f3'];
-ORDER.forEach(function(id,i){var b=document.createElement('button');b.type='button';b.className='b';b.dataset.id=id;b.setAttribute('aria-expanded','false');b.setAttribute('aria-controls','pop');
+ALL.forEach(function(id,i){var b=document.createElement('button');b.type='button';b.className='b';b.dataset.id=id;b.setAttribute('aria-expanded','false');b.setAttribute('aria-controls','pop');
  b.innerHTML='<span class="dr"><span class="fl '+FLT[i%3]+'" style="animation-delay:-'+(i*1.37%7).toFixed(2)+'s"><span class="face c-'+id+'"><span class="now" hidden>Now</span><span class="ico">'+ic(id,22,2.2).replace(/width="22" height="22" /,'')+'</span><span class="lb"></span><span class="sb"></span></span></span></span>';
  field.appendChild(b);EL[id]=b;});
 
-function paintBubbles(){var t=tiers();ORDER.forEach(function(id){var b=EL[id],x=bubbleText(id);
+function paintBubbles(){var t=tiers();ALL.forEach(function(id){EL[id].hidden=ORDER.indexOf(id)<0;});ORDER.forEach(function(id){var b=EL[id],x=bubbleText(id);
  b.querySelector('.lb').textContent=x[0];b.querySelector('.sb').textContent=x[1];
- b.querySelector('.now').hidden=t[id]!==0;
- b.className='b t'+t[id]+(OPEN===id?' src':'');b.setAttribute('aria-label',x[0]+'. '+x[1]);});}
+ b.querySelector('.now').hidden=!(id==='now'||(LEVEL==='day'&&id===nowTarget()));
+ b.className='b t'+t[id]+(OPEN===id||SRC===id?' src':'')+(LEVEL==='top'?' top':'');b.querySelector('.ico').innerHTML=ic(id,22,2.2).replace(/width="22" height="22" /,'');b.setAttribute('aria-label',x[0]+'. '+x[1]);});}
 
 /* ---------- packing: greedy, center-out on an ellipse, then centered. Never overlaps, never leaves the field. ---------- */
-var REL=[1,.75,.65,.6],TIER={},lastKey='';
+var REL=[1,.78,.62,.6],TIER={},lastKey='';
 function hdrH(){return $('hd').offsetHeight;}
 function footH(){return $('foot').offsetHeight;}
 var PTS={key:'',pts:null};
@@ -139,8 +149,9 @@ function pack(W,H,ds,gap,pad,VH){
 function layout(animate){
  var W=Math.min(document.documentElement.clientWidth,1100),vh=window.innerHeight,H=Math.max(300,vh-hdrH()-footH());
  if(W<120)return;
+ if(LEVEL==='top'&&layoutTop(W,H,animate))return;
  var t=tiers(),ids=ORDER.slice().sort(function(a,b){return t[a]-t[b]||ORDER.indexOf(a)-ORDER.indexOf(b);});
- var key=W+'x'+H+'|'+ids.map(function(i){return i+t[i];}).join(',');
+ var key=LEVEL+W+'x'+H+'|'+ids.map(function(i){return i+t[i];}).join(',');
  if(key===lastKey&&!animate)return;lastKey=key;
  var minB=Math.min(104,W*.29),Dmax=Math.min(W*.47,Math.max(H*.36,150),250),Dmin=Math.min(140,Dmax),res=null,D,gap,pad=10,HH=H;
  for(var tries=0;!res&&tries<6;tries++){
@@ -160,12 +171,20 @@ function layout(animate){
    b.animate([{transform:'translate('+(o.x-c.x)+'px,'+(o.y-c.y)+'px) scale('+(o.d/d)+')'},{transform:'none'}],{duration:700,easing:'cubic-bezier(.3,1.25,.4,1)'});}
  });}
 
+var TOPPOS={day:[130,150,230],now:[265,345,210],cal:[95,420,150],msg:[175,560,160],more:[320,545,120]};
+function layoutTop(W,H,animate){var sc=Math.min(W/390,H/650,1.5);if(sc<.62)return false;var ox=(W-390*sc)/2,oy=Math.max(0,(H-650*sc)/2);
+ field.style.height=Math.max(H,650*sc)+'px';field.style.maxWidth=W+'px';lastKey='top';
+ ORDER.forEach(function(id){var q=TOPPOS[id],d=q[2]*sc,x=ox+q[0]*sc,y=oy+q[1]*sc,b=EL[id];GEO[id]={x:x,y:y,d:d};
+  b.style.width=b.style.height=d+'px';b.style.left=(x-d/2)+'px';b.style.top=(y-d/2)+'px';b.style.transform='';
+  b.style.setProperty('--d',d+'px');b.style.setProperty('--fs',Math.max(16,Math.min(28,d*.115)).toFixed(1)+'px');
+  b.style.setProperty('--fs2',Math.max(13,Math.min(17,d*.075)).toFixed(1)+'px');b.style.setProperty('--ic',Math.max(20,Math.min(38,d*.15)).toFixed(0)+'px');b.querySelector('.sb').hidden=false;});
+ return true;}
 /* ---------- header ---------- */
 function paintHeader(){var p=phase(T),b=blockAt(T),nx=nextBlock(T);
  var hi={early:'Still sleepy?',before:'Good morning!',school:'You\u2019re at school',lunch:'Lunch break!',home:'School\u2019s out!',after:'Good afternoon',evening:'Good evening',night:'Almost bedtime',bed:'Lights out soon'}[p];
  $('hi').textContent=hi;
  var now=b?b[2]:(nx?'Free till '+hm(nx[0]):'Free time');
- $('st').innerHTML='<b>Thu, Oct 8 \u00b7 '+ap(T)+'</b><span>'+esc(now)+'</span><span class="tip">Tap any bubble.</span>';
+ $('st').innerHTML='<b>Thu, Oct 8 \u00b7 '+ap(T)+'</b><span>'+esc(now)+'</span><span class="tip">Tap a bubble to open it.</span>';
  ['before','school','after','night'].forEach(function(k){$('bg-'+k).classList.toggle('on',THEME[p]===k);});
  var tc={before:'#1f2550',school:'#0f1d40',after:'#1b1739',night:'#060a18'}[THEME[p]];var m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('content',tc);}
 
@@ -188,7 +207,8 @@ var PANELS={
  due:function(){var h='<p class="mut">Tap one when it\u2019s done.</p><div>';
   TASKS.forEach(function(t){h+=rowCk('data-act="toggle" data-id="'+t.id+'"',t.title,SUBJ[t.subject].name+' \u00b7 '+t.due+' \u00b7 '+t.minutes+' min',S.done[t.id],'<i class="dot" style="background:'+SUBJ[t.subject].color+'"></i>');});
   return h+'</div>';},
- day:function(){var p=phase(T);
+ chores:function(){var h='<p class="mut">Your jobs at home today. Tap when done.</p><div>';CHORES.forEach(function(c,i){h+=rowCk('data-act="chore" data-i="'+i+'"',c[0],c[1],S.chores[i]);});return h+'</div><div class="card" style="margin-top:14px"><b>Weekly goal</b><p class="mut">'+esc(GOAL.title)+' \u00b7 '+goalDone()+' of 7 days</p></div>';},
+ sched:function(){var p=phase(T);
   if(p==='night'||p==='bed'){var d=dueTomorrow();return '<div class="card"><p style="font-size:21px;font-weight:800">Friday, Oct 9</p><p class="mut">Up at '+ap(WAKE)+' \u00b7 leave by '+ap(LEAVE)+'</p></div><p class="sec">Due tomorrow</p>'+
    (d.length?d.map(function(t){return '<div class="row"><i class="dot" style="background:'+SUBJ[t.subject].color+'"></i><span class="tx"><b>'+esc(t.short)+'</b><span>'+SUBJ[t.subject].name+'</span></span></div>';}).join(''):'<div class="card">Nothing. You\u2019re all set \u2713</div>')+
    '<p class="sec">Also tomorrow</p><div class="row"><span class="tx"><b>Math classroom check</b><span>Optional review</span></span></div><div class="row"><span class="tx"><b>Basketball</b><span>3:15 \u00b7 Gym</span></span></div>';}
@@ -238,7 +258,7 @@ function startF(id){var t=task(id);if(!F||F.id!==id)F={id:id,total:t.minutes*60,
 function pauseF(){if(!F)return;tick();F.run=false;clearInterval(FT);}
 
 /* ---------- open / close: one circle grows from the bubble (transform: scale only) ---------- */
-var OPEN=null,busy=false,anims=[],pop=$('pop'),blob=$('blob'),panel=$('panel');
+var SRC=null,OPEN=null,busy=false,anims=[],pop=$('pop'),blob=$('blob'),panel=$('panel');
 function vw(){return window.innerWidth;}function vh(){return window.innerHeight;}
 function placeBlob(cx,cy){var R=Math.ceil(Math.max(Math.hypot(cx,cy),Math.hypot(vw()-cx,cy),Math.hypot(cx,vh()-cy),Math.hypot(vw()-cx,vh()-cy)))+4;
  blob.style.width=blob.style.height=2*R+'px';blob.style.left=(cx-R)+'px';blob.style.top=(cy-R)+'px';return R;}
@@ -248,8 +268,8 @@ function flipFrom(el,from,fromEl){var to=el.getBoundingClientRect();if(!to.width
  var s=fromEl?parseFloat(getComputedStyle(fromEl).fontSize)/parseFloat(getComputedStyle(el).fontSize):from.width/to.width;
  var dx=(from.left+from.width/2)-(to.left+to.width/2),dy=(from.top+from.height/2)-(to.top+to.height/2);
  return 'translate('+dx.toFixed(1)+'px,'+dy.toFixed(1)+'px) scale('+s.toFixed(3)+')';}
-function open(id){
- if(OPEN||busy)return;var b=EL[id],face=b.querySelector('.face'),r=face.getBoundingClientRect();
+function open(id,from){
+ if(OPEN||busy)return;from=from||id;SRC=from;var b=EL[from],face=b.querySelector('.face'),r=face.getBoundingClientRect();
  var lbR=b.querySelector('.lb').getBoundingClientRect(),icR=b.querySelector('.ico').getBoundingClientRect(),sbE=b.querySelector('.sb'),sbR=sbE.hidden?null:sbE.getBoundingClientRect();
  OPEN=id;busy=true;S.read=S.read||id==='msg';
  if(id==='msg')save();
@@ -270,14 +290,14 @@ function open(id){
  var kids=[document.querySelector('.bar')].concat([].slice.call($('pBody').children,0,12));
  kids.forEach(function(el,i){el.animate([{opacity:0,transform:'translateY(18px)'},{opacity:1,transform:'none'}],{duration:340,delay:210+i*28,easing:'cubic-bezier(.2,.8,.2,1)',fill:'backwards'});});
  /* the other bubbles drift aside */
- ORDER.forEach(function(o){if(o===id)return;var g=EL[o].getBoundingClientRect(),ox=g.left+g.width/2-cx,oy=g.top+g.height/2-cy,d=Math.hypot(ox,oy)||1,push=60+9000/(d+60);
+ ORDER.forEach(function(o){if(o===from)return;var g=EL[o].getBoundingClientRect(),ox=g.left+g.width/2-cx,oy=g.top+g.height/2-cy,d=Math.hypot(ox,oy)||1,push=60+9000/(d+60);
   EL[o].firstChild.animate([{transform:'none'},{transform:'translate('+(ox/d*push).toFixed(1)+'px,'+(oy/d*push).toFixed(1)+'px) scale(.82)'}],{duration:D,easing:E,fill:'forwards'});});
  setTimeout(done,D);}
 function close(fromPop){
- if(!OPEN||busy)return;var id=OPEN,b=EL[id];
+ if(!OPEN||busy)return;var id=SRC||OPEN,b=EL[id];
  if(!fromPop&&history.state&&history.state.bubble){try{history.back();return;}catch(e){}}
  busy=true;field.inert=false;$('foot').inert=false;
- var fin=function(){pop.className='pop';b.classList.remove('src');b.setAttribute('aria-expanded','false');document.body.classList.remove('opened');OPEN=null;busy=false;
+ var fin=function(){pop.className='pop';b.classList.remove('src');b.setAttribute('aria-expanded','false');document.body.classList.remove('opened');OPEN=null;SRC=null;busy=false;
   ORDER.forEach(function(o){EL[o].firstChild.getAnimations&&EL[o].firstChild.getAnimations().forEach(function(a){a.cancel();});});
   paintBubbles();try{b.focus({preventScroll:true});}catch(e){}};
  if(RM.matches||!blob.animate){fin();return;}
@@ -293,17 +313,30 @@ function close(fromPop){
  ORDER.forEach(function(o){if(o===id)return;var an=EL[o].firstChild.getAnimations?EL[o].firstChild.getAnimations():[];an.forEach(function(x){x.updatePlaybackRate?x.updatePlaybackRate(560/D):null;x.reverse();});});
  a.onfinish=function(){[blob,$('pTitle'),$('pIco'),$('pSub'),$('pBody'),document.querySelector('.bar')].forEach(function(el){el.getAnimations&&el.getAnimations().forEach(function(x){x.cancel();});});
   fin();face.animate([{transform:'scale(1.06)'},{transform:'scale(.97)'},{transform:'none'}],{duration:380,easing:'ease-out'});};}
-window.addEventListener('popstate',function(){if(OPEN)close(true);});
+window.addEventListener('popstate',function(){if(OPEN)close(true);else if(LEVEL!=='top')goLevel('top');});
 
 /* ---------- interactions ---------- */
-field.addEventListener('click',function(e){var b=e.target.closest('.b');if(b)open(b.dataset.id);});
+field.addEventListener('click',function(e){var b=e.target.closest('.b');if(!b||busy||OPEN)return;var id=b.dataset.id;
+ if(id==='day'){goLevel('day',id);return;}
+ if(id==='more'){if(window.AEIOSDrawer)window.AEIOSDrawer.open();return;}
+ if(id==='now'){open(nowTarget(),'now');return;}
+ open(id);});
+function goLevel(lv,fromId){if(lv===LEVEL)return;var g=GEO[fromId]||GEO.day||{x:field.clientWidth/2,y:200,d:100};var prev=ORDER.slice();
+ LEVEL=lv;ORDER=LEVELS[lv];paintNav();paintBubbles();layout(false);
+ if(!RM.matches&&field.animate){var c=lv==='top'?(GEO.day||g):g;ORDER.forEach(function(id,i){var q=GEO[id];if(!q)return;EL[id].animate([{transform:'translate('+(c.x-q.x)+'px,'+(c.y-q.y)+'px) scale(.25)',opacity:0},{transform:'none',opacity:1}],{duration:560,delay:i*45,easing:'cubic-bezier(.3,1.3,.45,1)',fill:'backwards'});});}
+ try{if(lv!=='top')history.pushState({level:lv},'');}catch(e){}
+ var f=EL[ORDER[0]];try{(lv==='top'?EL.day:$('lvback')).focus({preventScroll:true});}catch(e){}}
+function paintNav(){var n=$('nav');if(!n)return;var top=LEVEL==='top';n.hidden=top;$('st').hidden=!top;$('lvt').textContent=top?'':'My day';$('lvs').textContent=top?'':'Schedule, checklist, homework, jobs';$('hi').hidden=!top;}
+$('lvback').addEventListener('click',function(){if(history.state&&history.state.level){history.back();}else goLevel('top');});
+$('menu').addEventListener('click',function(){if(window.AEIOSDrawer)window.AEIOSDrawer.open();});
 $('back').addEventListener('click',function(){close();});
-document.addEventListener('keydown',function(e){if(e.key==='Escape'&&OPEN)close();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){if(OPEN)close();else if(LEVEL!=='top'&&!document.querySelector('.adw.on'))goLevel('top');}});
 $('pBody').addEventListener('click',function(e){
  var b=e.target.closest('[data-act]');if(!b)return;var a=b.dataset.act,id=b.dataset.id,on;
  switch(a){
  case 'close':close();return;
  case 'step':S.steps[id]=S.steps[id]||{};on=!S.steps[id][b.dataset.i];S.steps[id][b.dataset.i]=on;b.setAttribute('aria-checked',on);save();return;
+ case 'chore':S.chores[b.dataset.i]=!S.chores[b.dataset.i];b.setAttribute('aria-checked',!!S.chores[b.dataset.i]);save();$('pSub').textContent=bubbleText('chores')[1];paintBubbles();return;
  case 'pack':var l=b.dataset.l;on=!S.checks[l][b.dataset.i];S.checks[l][b.dataset.i]=on;b.setAttribute('aria-checked',on);save();
   var n=cnt(l);$('bagn').textContent=n===6?'All packed \u2713':n+' of 6';$('bagbar').style.transform='scaleX('+(n/6).toFixed(3)+')';$('pSub').textContent=bubbleText('bag')[1];paintBubbles();return;
  case 'toggle':on=!S.done[id];if(on)S.done[id]=true;else delete S.done[id];b.setAttribute('aria-checked',on);save();$('pSub').textContent=bubbleText('due')[1];paintBubbles();return;
@@ -322,10 +355,10 @@ $('pBody').addEventListener('click',function(e){
  }
  renderBody();paintBubbles();});
 $('pBody').addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target.id==='ans'){e.preventDefault();var b=document.querySelector('[data-act=answer]');if(b)b.click();}});
-$('reset').addEventListener('click',function(){if(F){pauseF();F=null;}S=fresh();save();render(true);});
+$('reset').addEventListener('click',function(){if(F){pauseF();F=null;}S=fresh();save();LEVEL='top';ORDER=LEVELS.top;render(true);});
 
 /* ---------- render + demo time ---------- */
-function render(animate){paintHeader();paintBubbles();layout(animate);if(OPEN)renderBody();}
+function render(animate){paintHeader();paintNav();paintBubbles();layout(animate);if(OPEN)renderBody();}
 function setT(t){if(t==null||t===T)return;T=t;render(true);}
 window.addEventListener('hashchange',function(){var h=/t=([0-9:]+)/.exec(location.hash||'');if(h)setT(parseT(h[1]));});
 /* the compare page posts {type:'demoTime', t:'HH:MM'}; only accept it from our own origin */
@@ -335,5 +368,5 @@ document.addEventListener('visibilitychange',function(){document.body.classList.
 render(false);
 /* first paint: bubbles pop in, staggered */
 if(!RM.matches&&field.animate){ORDER.slice().sort(function(a,b){return GEO[a].y-GEO[b].y;}).forEach(function(id,i){EL[id].animate([{transform:'scale(.4)',opacity:0},{transform:'none',opacity:1}],{duration:620,delay:60+i*45,easing:'cubic-bezier(.3,1.35,.45,1)',fill:'backwards'});});}
-window.__bubbles={get T(){return T;},setT:setT,open:open,close:close,get open_(){return OPEN;},get busy(){return busy;},geo:function(){return GEO;}};
+window.__bubbles={goLevel:goLevel,get level(){return LEVEL;},get T(){return T;},setT:setT,open:open,close:close,get open_(){return OPEN;},get busy(){return busy;},geo:function(){return GEO;}};
 })();

@@ -38,6 +38,15 @@ svg{flex:none;display:block}
 .st b{color:#fff;font-weight:750}
 .tip{font-size:14px;color:rgba(255,255,255,.7)}
 
+.hrow{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.hd .hi{padding-right:56px}.nav{padding-right:56px}
+.mbtn{position:absolute;right:calc(14px + env(safe-area-inset-right));top:calc(10px + env(safe-area-inset-top));z-index:3;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.14);flex:none}
+.nav{display:flex;align-items:center;gap:12px;margin-top:2px}
+.nav[hidden]{display:none!important}
+.lvb{display:inline-flex;align-items:center;gap:4px;min-height:48px;padding:0 16px 0 10px;border-radius:999px;background:rgba(255,255,255,.2);font-weight:800;font-size:17px;flex:none}
+.lvt{font-size:26px;font-weight:850;letter-spacing:-.4px;line-height:1.1}
+.lvs{font-size:14px;color:var(--soft);font-weight:650}
+.b.top .lb{font-size:calc(var(--fs) * 1.08)}
 /* the bubble field */
 .field{position:relative;z-index:1;margin:0 auto;width:100%}
 .b{position:absolute;left:0;top:0;border-radius:50%;padding:0;transform-origin:50% 50%;-webkit-user-select:none;user-select:none}
@@ -74,6 +83,11 @@ body.opened .fl,body.hidden-doc .fl{animation-play-state:paused}
 .c-clubs{--c1:#b0561a;--c2:#7e3a0e;--sh:#d06a24}
 .c-goal{--c1:#2a7d36;--c2:#1a5524;--sh:#36a046}
 .c-teaser{--c1:#8e3cc8;--c2:#62248f;--sh:#9e4cd8}
+.c-now{--c1:#7c4dff;--c2:#4a22c4;--sh:#8a5cff}
+.c-sched{--c1:#2563e0;--c2:#1a45ad;--sh:#2563e0}
+.c-more{--c1:#3b4766;--c2:#232c45;--sh:#5a6890}
+.c-chores{--c1:#b02f8f;--c2:#7a1d62;--sh:#b02f8f}
+.c-day{--c1:#d9661c;--c2:#9a420a;--sh:#e07a2a}
 .c-journal{--c1:#c03850;--c2:#8c2236;--sh:#d04860}
 
 /* expanded view: a circle grows from the bubble to cover the screen, content rides on it */
@@ -161,13 +175,14 @@ input.ans{min-height:56px;font-size:22px;font-weight:800}
 }
 </style>
 </head>
-<body>
+<body class="adw-notab">
 <div class="bg bg--before" id="bg-before"></div><div class="bg bg--school" id="bg-school"></div><div class="bg bg--after" id="bg-after"></div><div class="bg bg--night" id="bg-night"></div>
 <header class="hd" id="hd">
-  <h1 class="hi" id="hi">Hey!</h1>
+  <div class="hrow"><h1 class="hi" id="hi">Hey!</h1><button type="button" class="mbtn" id="menu" aria-label="Open menu: courses, chess, grades and more"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
   <p class="st" id="st"></p>
+  <div class="nav" id="nav" hidden><button type="button" class="lvb" id="lvback"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>All</button><div><h2 class="lvt" id="lvt"></h2><p class="lvs" id="lvs"></p></div></div>
 </header>
-<main class="field" id="field" aria-label="Everything you can do"></main>
+<main class="field" id="field" aria-label="Your day in bubbles"></main>
 <p class="foot" id="foot">Sample data only. <button type="button" id="reset">Reset demo</button></p>
 <section class="pop" id="pop" aria-labelledby="pTitle" role="region">
   <div class="blob" id="blob"></div>
@@ -178,5 +193,6 @@ input.ans{min-height:56px;font-size:22px;font-weight:800}
   </div></div>
 </section>
 <script src="app.js"></script>
+<script src="../../shared/drawer.js"></script>
 </body>
 </html>
