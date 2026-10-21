@@ -34,48 +34,48 @@ function ic(n,s,fill){return '<svg width="'+(s||20)+'" height="'+(s||20)+'" view
 
 /* ---------- sample plan (built with the coach) ---------- */
 var BASE=[
- ['bfast',425,460,'Breakfast & bag check','Lab notebook in?','--food','bag'],
- ['leave',465,495,'Leave for school','Bus at 7:45','--school','bus'],
- ['school',495,870,'School','Science is 4th period','--school','school'],
- ['snack',900,960,'Snack & chill','Phone break, guilt-free','--food','snack'],
- ['lab',960,1005,'Lab writeup','Science · due tomorrow','--sci','lab'],
- ['piano',1010,1040,'Piano practice','20 min, then done','--music','music'],
+ ['bfast',425,460,'Breakfast','Pack lab notebook','--food','bag'],
+ ['leave',465,495,'Bus','7:45','--school','bus'],
+ ['school',495,870,'School','Until 2:30','--school','school'],
+ ['snack',900,960,'Snack & chill','Break','--food','snack'],
+ ['lab',960,1005,'Lab writeup','Science · due Fri','--sci','lab'],
+ ['piano',1010,1040,'Piano','20 min','--music','music'],
  ['math',1050,1080,'Math worksheet','Pages 40–44 · due Fri','--math','math'],
- ['dinner',1110,1140,'Dinner','Family table','--food','food'],
- ['read',1170,1200,'Read a chapter','Any book you like','--read','book'],
- ['wrap',1230,1245,'Wrap-up with coach','Quick call or text','--call','phone'],
- ['lights',1290,1300,'Lights out','Sleep well','--rest','moon']];
+ ['dinner',1110,1140,'Dinner','','--food','food'],
+ ['read',1170,1200,'Read','20 min','--read','book'],
+ ['wrap',1230,1245,'Wrap-up','5 min','--call','phone'],
+ ['lights',1290,1300,'Lights out','','--rest','moon']];
 var MOVED={piano:[960,990],lab:[1020,1065],math:[1070,1100]}; /* "Make it 5" */
 
 /* ---------- per-phase content ---------- */
 var P={
- morning:{when:435,sent:'texted 7:05 AM',note:'Planned with coach last night at 8:40',pts:110,
+ morning:{when:435,sent:'7:05 AM',note:'From last night',pts:110,
   msg:'Morning, Maya! ☀️ Leave by <em>7:45</em>. Is your lab notebook and math worksheet in your bag?',
   chips:[['Bag’s packed ✓','Nice! That’s 4 mornings in a row 🎒 Have a great day. I’ll text you after school.',function(){S.tog.bfast=true;},10],
    ['Remind me at 7:40','You got it. I’ll text you at 7:40 sharp ⏰',null,0],['Talk it through','call']],
   call:[['Coach','Morning! Quick bag check: lab notebook?'],['Coach','And the math worksheet, pages 40 to 44.']],
   say:[['Got both','Perfect. Out the door by 7:45 and you’re golden.'],['Can’t find the worksheet','Check your blue folder first. If it’s not there, I’ll remind you to grab a copy from Ms. Rivera.']],
   notes:['chen','dad0']},
- school:{when:600,sent:'texted 8:05 AM',note:'Planned with coach last night at 8:40',pts:120,
+ school:{when:600,sent:'8:05 AM',note:'From last night',pts:120,
   msg:'Have an awesome day. I’ll stay quiet while you’re in class 🤫 Watch what the cart does in lab, 4th period!',
   chips:[['👍 Got it','See you at 2:30 👋',null,0],['Remind me at lunch','Will do. I’ll text at 11:30.',null,0]],
   call:[['Coach','Hey! You’re at school, so I’ll keep this short. What’s up?']],
   say:[['Just checking in','Love that. Talk after school!']],
   notes:['chen','dad0']},
- afternoon:{when:945,sent:'texted 3:40 PM',note:'Planned with coach at 3:40',pts:130,
+ afternoon:{when:945,sent:'3:40 PM',note:'3:40',pts:130,
   msg:'Hey Maya, you’ve got the <em>science lab writeup</em> due tomorrow and a <em>math worksheet</em>. Want to start with the lab at 4?',
   chips:[['Yes, 4 works','Locked in 🔒 I’ll text you at 4. Tiny first step: open the lab doc and write one sentence about what the cart did.',null,10],
-   ['Make it 5','Done! Piano at 4, lab at 5, worksheet after. Your plan’s updated ✨',function(){S.moved=true;},10],['Talk it through','call']],
+   ['Make it 5','Done! Piano at 4, lab at 5, worksheet after.',function(){S.moved=true;},10],['Talk it through','call']],
   call:[['Coach','Hey Maya! So, lab writeup and a math worksheet tonight.'],['Coach','Which one feels bigger right now?']],
   say:[['The lab','Then let’s do it first while your brain is fresh. What’s the one thing the cart did that surprised you?'],['Can I start at 5?','Sure. Piano at 4, lab at 5. I’ll update your plan.'],['I’m stuck on the ending','Endings are just: what happened, and one thing you’d test next time. Want to say it out loud first?']],
   notes:['rivera','chen']},
- dinner:{when:1110,sent:'texted 6:10 PM',note:'Planned with coach at 3:40',pts:140,
+ dinner:{when:1110,sent:'6:10 PM',note:'3:40',pts:140,
   msg:'Lab writeup: <em>done</em> ✅ Nice! Dinner’s at 6:30. Want to do the math worksheet after dinner?',
   chips:[['After dinner','Cool. 7:15, 25 minutes, then reading. I’ll ping you.',null,10],['Doing it now','Go for it 💪 Pages 40 to 44. Text me if a problem gets weird.',null,10],['Talk it through','call']],
   call:[['Coach','Hey! Lab’s done, amazing. Worksheet: now or after dinner?']],
   say:[['After dinner','Deal. I’ll text you at 7:15.']],
   notes:['rivera','dad1']},
- evening:{when:1230,sent:'texted 8:30 PM',note:'Planned with coach at 3:40',pts:150,
+ evening:{when:1230,sent:'8:30 PM',note:'3:40',pts:150,
   msg:'Hey Maya, wrap-up time 🌙 <em>What got done?</em> Anything for tomorrow?',
   chips:[['All done!','Amazing day 🙌 Tomorrow: argument revision and history sources are due. Bag check at 7:15. Sleep well!',function(){S.tog.math=true;S.tog.read=true;S.tog.wrap=true;},10],
    ['Worksheet’s not done','No stress. I moved it to tomorrow at 3:45, 25 minutes. Anything else for tomorrow?',function(){S.tog.wrap=true;S.tmrw=true;},10],['Talk it through','call']],
@@ -109,7 +109,7 @@ function render(){
  document.querySelector('meta[name=theme-color]').content=themeOf(PH)==='evening'?'#141238':themeOf(PH)==='morning'?'#fff6dc':themeOf(PH)==='school'?'#eaf3ff':'#fff4e8';
  $('when').textContent='Thu, Oct 8 · '+clk(T);
  [].forEach.call($('seg').children,function(b){var on=b.dataset.p===themeOf(PH);b.setAttribute('aria-checked',on);b.tabIndex=on?0:-1;});
- $('sent').textContent='Your coach · '+p.sent;
+ $('sent').textContent=p.sent;
  renderThread();renderPlan();renderThink();renderNotes();renderPts();
 }
 function renderThread(){
@@ -127,11 +127,11 @@ function renderPlan(){
  b.forEach(function(x){var d=isDone(x);if(d)done++;var now=x.id===nowId;
   h+='<button type="button" role="listitem" class="blk'+(d?' done':'')+(now?' now':'')+(x.flash?' moved':'')+'" data-b="'+x.id+'" style="--c:var('+x.c+')" aria-pressed="'+d+'" aria-label="'+esc(sh(x.s)+' '+x.t+'. '+(d?'Done':'Tap to mark done'))+'">'+
    (now?'<span class="tag">Now</span>':'')+'<span class="ck">'+ic('check',16)+'</span><span class="tm">'+sh(x.s)+'</span><span class="bi">'+ic(x.i,18)+'</span><span class="bt">'+esc(x.t)+'</span><span class="bs">'+esc(x.id==='math'&&S.tmrw?'Moved to tomorrow 3:45':x.sub)+'</span></button>';});
- h+='<div role="listitem" class="blk tmrw"><span class="tm">Tomorrow · Fri</span><span class="bt">Coming up</span><span class="bs">'+(S.tmrw?'Math worksheet 3:45<br>':'')+'Argument revision due<br>History sources due<br>Basketball 3:15</span></div>';
+ h+='<div role="listitem" class="blk tmrw"><span class="tm">Fri</span><span class="bt">Tomorrow</span><span class="bs">'+(S.tmrw?'Math worksheet<br>':'')+'Essay revision<br>History sources<br>Basketball 3:15</span></div>';
  $('strip').innerHTML=h;
  $('progT').textContent=done+' of '+b.length+' done';
  $('progB').style.transform='scaleX('+(done/b.length)+')';
- $('planNote').innerHTML=ic('check',14)+esc(S.moved||S.tmrw?'Updated with coach just now':P[PH].note);
+ $('planNote').innerHTML='<span class="mini">'+avatar()+'</span>'+esc(S.moved||S.tmrw?'Updated':P[PH].note);
  return nowId||nextId;
 }
 function scrollPlan(smooth){var id=null,b=blocks();b.forEach(function(x){if(!id&&T<x.e)id=x.id;});if(!id)id=b[b.length-1].id;
@@ -143,8 +143,8 @@ function renderThink(){
  $('days').innerHTML=h;
  $('bThink').classList.toggle('did',THINK);
  $('bThink').querySelector('.ic').innerHTML=THINK?ic('check',16):'<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V21h2v-2.1A7 7 0 0 0 19 12Z"/></svg>';
- $('thinkL').textContent=THINK?'Done today · talk again':'Start a 5-min talk';
- document.querySelector('.qh').textContent=THINK?'Nice thinking today. Tomorrow’s question unlocks at 3:30.':PH==='evening'?'Still time tonight to keep your streak going. No wrong first guesses.':'No looking it up. Coach asks, you think out loud. No wrong first guesses.';
+ $('thinkL').textContent=THINK?'Talk again':'Start a 5-min talk';
+ var qh=document.querySelector('.qh');qh.hidden=!(qh.textContent=THINK?'Done for today. New one tomorrow.':PH==='evening'?'Still time tonight.':'');
 }
 function renderNotes(){var h='';P[PH].notes.forEach(function(k){var n=NOTES[k],w='';for(var i=0;i<22;i++)w+='<i style="height:'+(6+Math.round(14*Math.abs(Math.sin(i*1.7+n[4]))))+'px"></i>';
  h+='<article class="note-c" data-n="'+k+'"><div class="nh"><span class="nav" style="background:'+n[1]+'">'+n[0]+'</span><div><b>'+esc(n[2])+'</b><span>'+esc(n[3])+' · voice note 0:'+(n[4]<10?'0':'')+n[4]+'</span></div>'+
@@ -152,7 +152,7 @@ function renderNotes(){var h='';P[PH].notes.forEach(function(k){var n=NOTES[k],w
  $('notes').innerHTML=h;}
 function totalPts(){return P[PH].pts+S.pts+BONUS;}
 function renderPts(){var t=totalPts();$('pts').innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2.5 2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z"/></svg>'+t+'<span class="sr"> points</span>';
- $('rwT').textContent=Math.min(t,200)+' / 200 pts · +10 per check-in';$('rwB').style.transform='scaleX('+Math.min(1,t/200)+')';}
+ $('rwT').textContent=Math.min(t,200)+' / 200 pts';$('rwB').style.transform='scaleX('+Math.min(1,t/200)+')';}
 function bump(n,why){if(!n)return;$('pts').classList.remove('bump');void $('pts').offsetWidth;$('pts').classList.add('bump');toast('+'+n+' pts · '+why);}
 var tt;function toast(s){var e=$('toast');e.textContent=s;e.classList.add('on');clearTimeout(tt);tt=setTimeout(function(){e.classList.remove('on');},2200);}
 
@@ -203,11 +203,11 @@ var call=null;
 function addCap(who,text){var d=document.createElement('div');d.className='cap'+(who==='You'?' me':'')+(RM?'':' enter');d.innerHTML='<b>'+esc(who)+'</b>'+esc(text);$('caps').appendChild(d);$('caps').scrollTop=$('caps').scrollHeight;}
 function openCall(mode){var src=mode==='practice'?PRACTICE:P[PH];
  call={mode:mode,sec:0,said:0,timers:[]};$('caps').innerHTML='';$('say').innerHTML='';$('callS').classList.remove('talking');
- $('callH').textContent=mode==='practice'?'Thinking practice · Coach Juno':'Coach Juno';$('callSt').textContent='Calling…';$('mute').setAttribute('aria-pressed','false');
+ $('callH').textContent=mode==='practice'?'Thinking practice':'Coach Juno';$('callSt').textContent='Calling…';$('mute').setAttribute('aria-pressed','false');
  show($('callS'));later(function(){$('endCall').focus();},60);
  call.timers.push(later(function(){if(!call)return;$('callS').classList.add('talking');tick();call.iv=setInterval(tick,1000);
   src.call.forEach(function(l,i){call.timers.push(later(function(){if(call)addCap(l[0],l[1]);if(i===src.call.length-1&&call)sayChips(src);},700+i*1500));});},1200));}
-function tick(){if(!call)return;$('callSt').textContent='On the line · 0:'+(call.sec<10?'0':'')+call.sec;call.sec++;}
+function tick(){if(!call)return;$('callSt').textContent='0:'+(call.sec<10?'0':'')+call.sec;call.sec++;}
 function sayChips(src){var h='';src.say.forEach(function(s,i){h+='<button type="button" data-say="'+i+'">“'+esc(s[0])+'”</button>';});$('say').innerHTML=h;}
 $('say').addEventListener('click',function(e){var b=e.target.closest('[data-say]');if(!b||!call)return;var src=call.mode==='practice'?PRACTICE:P[PH],s=src.say[+b.dataset.say];
  addCap('You',s[0]);call.said++;b.disabled=true;b.style.opacity=.4;call.timers.push(later(function(){if(call)addCap('Coach',s[1]);},900));});
@@ -215,13 +215,13 @@ $('mute').addEventListener('click',function(){var on=this.getAttribute('aria-pre
 function endCall(){if(!call)return hide();var c=call;call=null;clearInterval(c.iv);c.timers.forEach(clearTimeout);hide();
  if(c.sec<1)return;var len='0:'+(c.sec<10?'0':'')+c.sec;
  if(c.mode==='practice'){if(!THINK&&c.said>0){THINK=true;BONUS+=15;renderThink();renderPts();bump(15,'streak '+(STREAK+1)+' 🔥');}else if(!THINK)toast('Answer once to count it for today');}
- else{S.thread.push({text:'📞 You talked with Coach Juno · '+len,n:1});if(!S.called){S.called=true;S.pts+=10;bump(10,'check-in');}S.chose=true;render();syncText();}}
+ else{S.thread.push({text:'📞 Call · '+len,n:1});if(!S.called){S.called=true;S.pts+=10;bump(10,'check-in');}S.chose=true;render();syncText();}}
 $('endCall').addEventListener('click',endCall);
 $('bCall').addEventListener('click',function(){openCall('call');});
 $('bThink').addEventListener('click',function(){openCall('practice');});
 
 /* texts (same thread as the top of the page) */
-var REPLIES=['Got it 👍 I’ll fold that into your plan.','Good thinking. Want me to add that to today’s plan?','On it. I’ll check back at your next block.'],ri=0;
+var REPLIES=['Got it 👍','Good call. Want me to add it to today?','On it.'],ri=0;
 function syncText(){if(!openSheet||openSheet!==$('textS'))return;var h='<span class="tm">Today '+esc(P[PH].sent.replace('texted ',''))+'</span><div class="bub">'+P[PH].msg+'</div>';
  S.thread.forEach(function(m){h+='<div class="bub'+(m.me?' me':'')+'">'+(m.html?m.text:esc(m.text))+'</div>';});
  if(S.typing)h+='<div class="typing" aria-label="Coach is typing"><i></i><i></i><i></i></div>';

@@ -84,30 +84,23 @@ svg{flex:none;display:block}
 .qr button:active{transform:scale(.95)}
 
 /* primary action */
-.act{margin-top:16px;background:linear-gradient(140deg,var(--coach),#4b2fd6);color:#fff;border-radius:28px;padding:16px;box-shadow:0 14px 30px -12px rgba(76,47,214,.6)}
-.act h2{font-size:14px;font-weight:800;letter-spacing:.02em;opacity:.9;margin:-2px 2px 10px}
+.act{margin-top:16px}
 .btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.big{min-height:96px;border-radius:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:10px 8px;font-size:18px;font-weight:850;line-height:1.1;text-align:center;white-space:nowrap}
+.big{min-height:64px;border-radius:22px;display:flex;align-items:center;justify-content:center;gap:10px;font-size:19px;font-weight:850;transition:transform .12s}
 .big .ic{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;flex:none}
-.big small{display:block;font-size:13px;font-weight:700;opacity:.8;margin-top:2px}
-.big.call{background:#fff;color:#3b22b8}
+.big.call{background:linear-gradient(140deg,var(--coach),#4b2fd6);color:#fff;box-shadow:0 12px 26px -12px rgba(76,47,214,.7)}
 .big.call .ic{background:#2fd08a;color:#fff}
-.big.text{background:rgba(255,255,255,.16);color:#fff;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.35)}
-.big.text .ic{background:rgba(255,255,255,.2)}
+.big.text{background:var(--card);color:var(--ink);box-shadow:var(--sh)}
+.big.text .ic{background:var(--chip);color:var(--chip-ink)}
 .big:active{transform:scale(.97)}
-.num{display:flex;align-items:center;gap:10px;margin-top:10px;padding:9px 12px;border-radius:16px;background:rgba(0,0,0,.16);font-size:14px;line-height:1.3}
-.num svg{opacity:.9}
-.num b{font-size:16px;font-weight:850;letter-spacing:.2px;white-space:nowrap}
-.num a{font-weight:800;text-decoration:underline;text-underline-offset:2px}
-.num .by{display:block;opacity:.75;font-size:12.5px;margin-top:2px}
+.num{display:block;width:max-content;margin:8px auto 0;padding:4px 10px;font-size:13px;font-weight:750;color:var(--muted);text-decoration:none;font-variant-numeric:tabular-nums;border-radius:999px}
 
 /* sections */
 .sec{margin-top:22px}
 .sh{display:flex;align-items:baseline;gap:8px;margin:0 2px 10px}
 .sh h2{font-size:20px;font-weight:850;letter-spacing:-.3px}
 .sh .note{margin-left:auto;font-size:13px;font-weight:700;color:var(--muted);display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
-.sh .note svg{color:var(--coach)}
-.ph-evening .sh .note svg{color:var(--coach2)}
+.sh .note .mini{width:18px;height:18px;display:inline-block}.sh .note .mini svg{width:100%;height:100%}
 
 /* day-block strip */
 .strip{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:4px 16px 12px;margin:0 -16px;scroll-padding:0 16px}
@@ -250,14 +243,12 @@ svg{flex:none;display:block}
   <div class="qr" id="qr"></div>
  </section>
 
- <section class="act" aria-labelledby="actH">
-  <h2 id="actH">Your coach, one tap away</h2>
+ <section class="act" aria-label="Call or text Coach Juno">
   <div class="btns">
-   <button type="button" class="big call" id="bCall"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/></svg></span><span>Talk to coach<small>Voice call</small></span></button>
-   <button type="button" class="big text" id="bText"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg></span><span>Text coach<small>Like a friend</small></span></button>
+   <button type="button" class="big call" id="bCall" aria-label="Talk: call Coach Juno"><span class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/></svg></span>Talk</button>
+   <button type="button" class="big text" id="bText" aria-label="Text Coach Juno"><span class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg></span>Text</button>
   </div>
-  <p class="num"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="3"/><path d="M11 18.5h2"/></svg>
-   <span>No app needed: <a href="tel:+15125550147">call</a> or <a href="sms:+15125550147">text</a> <b>(512) 555-0147</b> from your phone.<span class="by">Saved as “Coach Juno” · phone line by Bland</span></span></p>
+  <a class="num" href="tel:+15125550147" aria-label="Coach Juno's number, (512) 555-0147">(512) 555-0147</a>
  </section>
 
  <section class="sec" aria-labelledby="planH">
@@ -267,11 +258,11 @@ svg{flex:none;display:block}
  </section>
 
  <section class="sec" aria-labelledby="thinkH">
-  <div class="sh"><h2 id="thinkH">Thinking practice</h2><span class="note">5 min · out loud</span></div>
+  <div class="sh"><h2 id="thinkH">Thinking practice</h2><span class="note">5 min</span></div>
   <div class="think">
    <span class="course"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3Z"/></svg>First-principles thinking · Level 2</span>
    <p class="q">A giant steel ship floats, but a tiny pebble sinks. What would have to be true for something to float?</p>
-   <p class="qh">No looking it up. Coach asks, you think out loud, there are no wrong first guesses.</p>
+   <p class="qh"></p>
    <div class="trow">
     <button type="button" class="go" id="bThink"><span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V21h2v-2.1A7 7 0 0 0 19 12Z"/></svg></span><span id="thinkL">Start a 5-min talk</span></button>
     <div class="streak"><span class="fl"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2c1 3.5 5 5.5 5 10.5A5 5 0 0 1 7 12.6c0-2 1-3.6 2-4.6 0 2 1 3 2 3 0-3-1-5.5 1-9Z"/></svg><span id="stN">4</span><span class="sl">-day streak</span></span><div class="days" id="days" aria-label="Streak this week"></div></div>
@@ -280,13 +271,12 @@ svg{flex:none;display:block}
  </section>
 
  <section class="sec" aria-labelledby="notH">
-  <div class="sh"><h2 id="notH">Noticed</h2><span class="note">voice notes for you</span></div>
+  <div class="sh"><h2 id="notH">Noticed</h2></div>
   <div class="nstrip" id="notes"></div>
   <div class="reward"><span class="ri"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 10a5 5 0 0 1 10 0M6.5 10h11L12 22z"/></svg></span>
-   <div class="rb"><b>Saturday ice-cream stop with Dad</b><span id="rwT"></span><div class="bar" aria-hidden="true"><i id="rwB"></i></div></div></div>
+   <div class="rb"><b>Ice cream with Dad · Sat</b><span id="rwT"></span><div class="bar" aria-hidden="true"><i id="rwB"></i></div></div></div>
  </section>
 
- <p class="foot">Concept F · Coach · fictional sample data, not a real student</p>
 </main>
 
 <div class="scrim" id="scrim" hidden></div>
@@ -300,10 +290,9 @@ svg{flex:none;display:block}
   <button type="button" id="mute" aria-pressed="false"><span class="cb"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3ZM19 12a7 7 0 0 1-14 0M12 19v3"/></svg></span>Mute</button>
   <button type="button" class="end" id="endCall"><span class="cb"><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 9c-3 0-5.8.8-8.3 2.3a1 1 0 0 0-.4 1.2l1 2.4a1 1 0 0 0 1.2.6l3-1a1 1 0 0 0 .7-.9V12a12 12 0 0 1 5.6 0v1.6a1 1 0 0 0 .7.9l3 1a1 1 0 0 0 1.2-.6l1-2.4a1 1 0 0 0-.4-1.2A15.6 15.6 0 0 0 12 9Z"/></svg></span>End</button>
  </div>
- <p class="demo">Demo call: nothing is dialed. In the real app this is a phone call on Coach Juno’s line (voice by Bland).</p>
 </section>
 <section class="sheet text-s" id="textS" role="dialog" aria-modal="true" aria-labelledby="textH" hidden>
- <div class="tsh"><span class="av" id="av3"></span><div><b id="textH">Coach Juno</b><span>(512) 555-0147 · same chat as your phone’s texts</span></div>
+ <div class="tsh"><span class="av" id="av3"></span><div><b id="textH">Coach Juno</b><span>(512) 555-0147</span></div>
   <button type="button" class="x" id="closeText" aria-label="Close texts"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
  <div class="tth" id="tth" aria-live="polite"></div>
  <form class="tin" id="tform" action="#"><label class="sr" for="tinput">Message to Coach Juno</label><input id="tinput" autocomplete="off" maxlength="300" placeholder="Text Coach Juno…"><button type="submit" aria-label="Send"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 20.5 21 12 3 3.5 3 10l12 2-12 2z"/></svg></button></form>
