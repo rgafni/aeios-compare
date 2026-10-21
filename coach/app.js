@@ -9,10 +9,7 @@ function sh(m){var h=Math.floor(m/60),mm=m%60;return (h%12||12)+':'+(mm<10?'0':'
 function later(fn,ms){return setTimeout(fn,RM?0:ms);}
 
 /* coach avatar: a friendly purple blob (no images, no external assets) */
-function avatar(){return '<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="31" fill="#7b5cff"/><path d="M8 26a26 26 0 0 1 48 0" fill="none" stroke="#a991ff" stroke-width="5" stroke-linecap="round"/>'+
- '<circle cx="23" cy="31" r="6" fill="#fff"/><circle cx="41" cy="31" r="6" fill="#fff"/><circle cx="24.5" cy="32" r="3" fill="#1d1838"/><circle cx="42.5" cy="32" r="3" fill="#1d1838"/>'+
- '<path d="M22 43c5 5 15 5 20 0" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/><circle cx="15" cy="41" r="3.5" fill="#ff8fb8" opacity=".8"/><circle cx="49" cy="41" r="3.5" fill="#ff8fb8" opacity=".8"/>'+
- '<path d="M52 6l1.6 3.8L57.5 11l-3.9 1.4L52 16l-1.6-3.6L46.5 11l3.9-1.2z" fill="#ffd35c"/></svg>';}
+function avatar(){return '<svg viewBox="0 0 36 36" aria-hidden="true"><rect width="36" height="36" rx="10" fill="#5b5bd6"/><path d="M22.5 10v10.5a5.5 5.5 0 0 1-11 0" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round"/><circle cx="12.5" cy="11.5" r="2" fill="#fff" opacity=".55"/></svg>';}
 ['av1','av2','av3'].forEach(function(i){$(i).innerHTML=avatar();});
 
 var IC={
@@ -50,43 +47,43 @@ var MOVED={piano:[960,990],lab:[1020,1065],math:[1070,1100]}; /* "Make it 5" */
 /* ---------- per-phase content ---------- */
 var P={
  morning:{when:435,sent:'7:05 AM',note:'From last night',pts:110,
-  msg:'Morning, Maya! ☀️ Leave by <em>7:45</em>. Is your lab notebook and math worksheet in your bag?',
-  chips:[['Bag’s packed ✓','Nice! That’s 4 mornings in a row 🎒 Have a great day. I’ll text you after school.',function(){S.tog.bfast=true;},10],
+  msg:'Morning. Bus at <em>7:45</em>. Lab notebook and math worksheet packed?',
+  chips:[['Packed','Nice, 4 mornings in a row. Talk after school.',function(){S.tog.bfast=true;},10],
    ['Remind me at 7:40','You got it. I’ll text you at 7:40 sharp ⏰',null,0],['Talk it through','call']],
   call:[['Coach','Morning! Quick bag check: lab notebook?'],['Coach','And the math worksheet, pages 40 to 44.']],
   say:[['Got both','Perfect. Out the door by 7:45 and you’re golden.'],['Can’t find the worksheet','Check your blue folder first. If it’s not there, I’ll remind you to grab a copy from Ms. Rivera.']],
   notes:['chen','dad0']},
  school:{when:600,sent:'8:05 AM',note:'From last night',pts:120,
-  msg:'Have an awesome day. I’ll stay quiet while you’re in class 🤫 Watch what the cart does in lab, 4th period!',
-  chips:[['👍 Got it','See you at 2:30 👋',null,0],['Remind me at lunch','Will do. I’ll text at 11:30.',null,0]],
+  msg:'Quiet till 2:30. Lab is 4th period.',
+  chips:[['Ok','Later.',null,0],['Remind me at lunch','Will do. I’ll text at 11:30.',null,0]],
   call:[['Coach','Hey! You’re at school, so I’ll keep this short. What’s up?']],
   say:[['Just checking in','Love that. Talk after school!']],
   notes:['chen','dad0']},
  afternoon:{when:945,sent:'3:40 PM',note:'3:40',pts:130,
-  msg:'Hey Maya, you’ve got the <em>science lab writeup</em> due tomorrow and a <em>math worksheet</em>. Want to start with the lab at 4?',
-  chips:[['Yes, 4 works','Locked in 🔒 I’ll text you at 4. Tiny first step: open the lab doc and write one sentence about what the cart did.',null,10],
+  msg:'Hey Maya, you’ve got the <em>lab writeup</em> due tomorrow and a <em>math worksheet</em>. Start with the lab at 4?',
+  chips:[['Yes, 4 works','Locked in. I’ll text at 4. First step: one sentence on what the cart did.',null,10],
    ['Make it 5','Done! Piano at 4, lab at 5, worksheet after.',function(){S.moved=true;},10],['Talk it through','call']],
   call:[['Coach','Hey Maya! So, lab writeup and a math worksheet tonight.'],['Coach','Which one feels bigger right now?']],
   say:[['The lab','Then let’s do it first while your brain is fresh. What’s the one thing the cart did that surprised you?'],['Can I start at 5?','Sure. Piano at 4, lab at 5. I’ll update your plan.'],['I’m stuck on the ending','Endings are just: what happened, and one thing you’d test next time. Want to say it out loud first?']],
   notes:['rivera','chen']},
  dinner:{when:1110,sent:'6:10 PM',note:'3:40',pts:140,
-  msg:'Lab writeup: <em>done</em> ✅ Nice! Dinner’s at 6:30. Want to do the math worksheet after dinner?',
-  chips:[['After dinner','Cool. 7:15, 25 minutes, then reading. I’ll ping you.',null,10],['Doing it now','Go for it 💪 Pages 40 to 44. Text me if a problem gets weird.',null,10],['Talk it through','call']],
+  msg:'Lab writeup <em>done</em>. Dinner at 6:30. Worksheet after?',
+  chips:[['After dinner','7:15 for 25 min, then reading.',null,10],['Doing it now','Pages 40–44. Text me if one gets weird.',null,10],['Talk it through','call']],
   call:[['Coach','Hey! Lab’s done, amazing. Worksheet: now or after dinner?']],
   say:[['After dinner','Deal. I’ll text you at 7:15.']],
   notes:['rivera','dad1']},
  evening:{when:1230,sent:'8:30 PM',note:'3:40',pts:150,
-  msg:'Hey Maya, wrap-up time 🌙 <em>What got done?</em> Anything for tomorrow?',
-  chips:[['All done!','Amazing day 🙌 Tomorrow: argument revision and history sources are due. Bag check at 7:15. Sleep well!',function(){S.tog.math=true;S.tog.read=true;S.tog.wrap=true;},10],
-   ['Worksheet’s not done','No stress. I moved it to tomorrow at 3:45, 25 minutes. Anything else for tomorrow?',function(){S.tog.wrap=true;S.tmrw=true;},10],['Talk it through','call']],
+  msg:'Wrap-up. <em>What got done?</em> Anything for tomorrow?',
+  chips:[['All done','Solid day. Tomorrow: essay revision and history sources. Bag check 7:15.',function(){S.tog.math=true;S.tog.read=true;S.tog.wrap=true;},10],
+   ['Worksheet’s not done','Moved to tomorrow 3:45, 25 min. Anything else?',function(){S.tog.wrap=true;S.tmrw=true;},10],['Talk it through','call']],
   call:[['Coach','Hey Maya! Wrap-up time. What got done today?']],
   say:[['Lab and piano','Two big ones! And the worksheet?'],['Worksheet’s not done','Okay. Tomorrow at 3:45 for 25 minutes. Sound good?'],['Nothing for tomorrow','Then pack your bag and you’re free. Night!']],
   notes:['rivera','dad1']}};
 var NOTES={
- rivera:['MR','#7a5cff','Ms. Rivera','Math · today 1:52 PM',9,'Maya, great question in class today about why you flip the sign. That’s real thinking.'],
- chen:['DC','#14a38b','Dr. Chen','Science · yesterday',11,'Nice graph in lab yesterday! Add one limitation to your write-up and it’s a strong one.'],
+ rivera:['MR','#7a5cff','Ms. Rivera','Math · 1:52 PM',9,'Maya, great question in class today about why you flip the sign. That’s real thinking.'],
+ chen:['DC','#14a38b','Dr. Chen','Science · Wed',11,'Nice graph in lab yesterday! Add one limitation to your write-up and it’s a strong one.'],
  dad0:['D','#ff7a3d','Dad','last night',7,'Thanks for packing your bag without me asking. I noticed!'],
- dad1:['D','#ff7a3d','Dad','today 7:05 PM',8,'Saw you start the lab on your own at 4. Proud of you, kiddo.']};
+ dad1:['D','#ff7a3d','Dad','7:05 PM',8,'Saw you start the lab on your own at 4. Proud of you, kiddo.']};
 var PRACTICE={call:[['Coach','Okay: giant steel ship floats, tiny pebble sinks.'],['Coach','Quick first guess. Is it about weight?']],
  say:[['It’s about weight','Good start! But the ship is WAY heavier than the pebble, and it floats. So what else could matter?'],['Maybe the shape?','Ooh. What does a ship’s shape do to the water around it?'],['Not sure','Totally fine. Picture pushing a beach ball underwater. What does the water do?']]};
 
@@ -106,7 +103,7 @@ function isDone(b){if(b.id in S.tog)return S.tog[b.id];if(b.id==='wrap'||b.id===
 function render(){
  var p=P[PH];
  document.body.className=document.documentElement.className='ph-'+themeOf(PH);
- document.querySelector('meta[name=theme-color]').content=themeOf(PH)==='evening'?'#141238':themeOf(PH)==='morning'?'#fff6dc':themeOf(PH)==='school'?'#eaf3ff':'#fff4e8';
+ document.querySelector('meta[name=theme-color]').content=themeOf(PH)==='evening'?'#0c0c0e':'#f4f4f5';
  $('when').textContent='Thu, Oct 8 · '+clk(T);
  [].forEach.call($('seg').children,function(b){var on=b.dataset.p===themeOf(PH);b.setAttribute('aria-checked',on);b.tabIndex=on?0:-1;});
  $('sent').textContent=p.sent;
@@ -147,7 +144,7 @@ function renderThink(){
  var qh=document.querySelector('.qh');qh.hidden=!(qh.textContent=THINK?'Done for today. New one tomorrow.':PH==='evening'?'Still time tonight.':'');
 }
 function renderNotes(){var h='';P[PH].notes.forEach(function(k){var n=NOTES[k],w='';for(var i=0;i<22;i++)w+='<i style="height:'+(6+Math.round(14*Math.abs(Math.sin(i*1.7+n[4]))))+'px"></i>';
- h+='<article class="note-c" data-n="'+k+'"><div class="nh"><span class="nav" style="background:'+n[1]+'">'+n[0]+'</span><div><b>'+esc(n[2])+'</b><span>'+esc(n[3])+' · voice note 0:'+(n[4]<10?'0':'')+n[4]+'</span></div>'+
+ h+='<article class="note-c" data-n="'+k+'"><div class="nh"><span class="nav">'+n[0]+'</span><div><b>'+esc(n[2])+'</b><span>'+esc(n[3])+' · 0:'+(n[4]<10?'0':'')+n[4]+'</span></div>'+
   '<button type="button" class="play" data-play="'+k+'" aria-label="Play voice note from '+esc(n[2])+'">'+ic('play',18,1)+'</button></div><div class="wave" aria-hidden="true">'+w+'</div><p class="tx">'+esc(n[5])+'</p></article>';});
  $('notes').innerHTML=h;}
 function totalPts(){return P[PH].pts+S.pts+BONUS;}
@@ -214,14 +211,14 @@ $('say').addEventListener('click',function(e){var b=e.target.closest('[data-say]
 $('mute').addEventListener('click',function(){var on=this.getAttribute('aria-pressed')!=='true';this.setAttribute('aria-pressed',on);});
 function endCall(){if(!call)return hide();var c=call;call=null;clearInterval(c.iv);c.timers.forEach(clearTimeout);hide();
  if(c.sec<1)return;var len='0:'+(c.sec<10?'0':'')+c.sec;
- if(c.mode==='practice'){if(!THINK&&c.said>0){THINK=true;BONUS+=15;renderThink();renderPts();bump(15,'streak '+(STREAK+1)+' 🔥');}else if(!THINK)toast('Answer once to count it for today');}
- else{S.thread.push({text:'📞 Call · '+len,n:1});if(!S.called){S.called=true;S.pts+=10;bump(10,'check-in');}S.chose=true;render();syncText();}}
+ if(c.mode==='practice'){if(!THINK&&c.said>0){THINK=true;BONUS+=15;renderThink();renderPts();bump(15,(STREAK+1)+'-day streak');}else if(!THINK)toast('Answer once to count it for today');}
+ else{S.thread.push({text:'Call · '+len,n:1});if(!S.called){S.called=true;S.pts+=10;bump(10,'check-in');}S.chose=true;render();syncText();}}
 $('endCall').addEventListener('click',endCall);
 $('bCall').addEventListener('click',function(){openCall('call');});
 $('bThink').addEventListener('click',function(){openCall('practice');});
 
 /* texts (same thread as the top of the page) */
-var REPLIES=['Got it 👍','Good call. Want me to add it to today?','On it.'],ri=0;
+var REPLIES=['Got it.','Want me to add that to today?','On it.'],ri=0;
 function syncText(){if(!openSheet||openSheet!==$('textS'))return;var h='<span class="tm">Today '+esc(P[PH].sent.replace('texted ',''))+'</span><div class="bub">'+P[PH].msg+'</div>';
  S.thread.forEach(function(m){h+='<div class="bub'+(m.me?' me':'')+'">'+(m.html?m.text:esc(m.text))+'</div>';});
  if(S.typing)h+='<div class="typing" aria-label="Coach is typing"><i></i><i></i><i></i></div>';
