@@ -161,3 +161,4 @@ label.l{display:block;font-size:15px;font-weight:650;color:var(--muted);margin:1
 .li.edit .mv button{height:44px}
 .li.edit .stp{margin-left:auto}
 .inl em{font-style:normal;font-weight:700}
+.btn.sm,.inl p,.toast{font-size:17px}
